@@ -1,103 +1,36 @@
 "use strict";
 
 (() => {
-	const config = {
-		pollingIntervalSeconds: 1.5,
-		maxMillisBeforeAckWhenClosed: 300,
-		moreAnnoyingDebuggerStatements: 1,
-		onDetectOpen: () => {
-			document.documentElement.innerHTML = "";
-			window.location.replace("https://syscycle.github.io/protectdebugging/chrome");
-		}
-	};
+	const redirectUrl = "https://syscycle.github.io/protectdebugging/chrome";
 
-	const heart = new Worker(URL.createObjectURL(new Blob([`
-		"use strict";
-		onmessage = (ev) => {
-			postMessage({isOpenBeat:true});
-			debugger;
-			for (let i = 0; i < ev.data.moreDebugs; i++) { debugger; }
-			postMessage({isOpenBeat:false});
-		};
-	`], {
-		type: "text/javascript"
-	})));
-
-	let _isDevtoolsOpen = false;
-	let _isDetectorPaused = true;
-	let consecutiveHits = 0;
-	let resolveVerdict = null;
-	let waitTimer = null;
-	let nextPulseTimer = null;
-
-	const onHeartMsg = (msg) => {
-		if (document.hidden) return;
-
-		if (msg.data.isOpenBeat) {
-			clearTimeout(waitTimer);
-			let p = new Promise((_resolve) => {
-				resolveVerdict = _resolve;
-				waitTimer = setTimeout(() => {
-					if (resolveVerdict) resolveVerdict(true);
-				}, config.maxMillisBeforeAckWhenClosed);
-			});
-
-			p.then((verdict) => {
-				if (verdict === null || document.hidden) return;
-
-				if (verdict === true) {
-					consecutiveHits++;
-				} else {
-					consecutiveHits = 0;
-				}
-
-				if (consecutiveHits >= 3 && !_isDevtoolsOpen) {
-					_isDevtoolsOpen = true;
-					config.onDetectOpen();
-				}
-
-				clearTimeout(nextPulseTimer);
-				nextPulseTimer = setTimeout(() => {
-					if (!_isDetectorPaused && !document.hidden) doOnePulse();
-				}, config.pollingIntervalSeconds * 1000);
-			});
-		} else {
-			clearTimeout(waitTimer);
-			if (resolveVerdict) {
-				resolveVerdict(false);
-				resolveVerdict = null;
-			}
-		}
-	};
-
-	const doOnePulse = () => {
-		if (document.hidden) return;
-		heart.postMessage({
-			moreDebugs: config.moreAnnoyingDebuggerStatements
-		});
-	};
-
-	heart.addEventListener("message", onHeartMsg);
-
-	document.addEventListener("visibilitychange", () => {
-		if (!document.hidden && !_isDetectorPaused) {
-			consecutiveHits = 0;
-			doOnePulse();
-		}
-	});
-
-	const startDetector = () => {
-		setTimeout(() => {
-			_isDetectorPaused = false;
-			doOnePulse();
-		}, 1500);
-	};
-
-	if (document.readyState === "complete") {
-		startDetector();
-	} else {
-		window.addEventListener("load", startDetector, { once: true });
+	function triggerDetect() {
+		document.documentElement.innerHTML = "";
+		window.location.replace(redirectUrl);
 	}
+
+	window.addEventListener("keydown", (e) => {
+		if (
+			e.key === "F12" ||
+			(e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key.toUpperCase())) ||
+			(e.ctrlKey && e.key.toUpperCase() === "U")
+		) {
+			e.preventDefault();
+			e.stopPropagation();
+			triggerDetect();
+		}
+	}, true);
+
+	function check() {
+		if (document.hidden) return;
+		const t0 = performance.now();
+		debugger;
+		const t1 = performance.now();
+		if (t1 - t0 > 200) {
+			triggerDetect();
+		}
+	}
+
+	setInterval(check, 1000);
 })();
 
 (function initPinMakerMod() {
@@ -111,7 +44,7 @@
 		fr: { sel: "CHOISIR FICHIER SPCFG", sav: "ENREGISTREMENT...", ok: "✓ ENREGISTRÉ !", cd: "Limite quotidienne atteinte. Veuillez patienter.", nd: "Aucune donnée trouvée !", inv: "Erreur : Seuls les fichiers .spcfg valides sont acceptés !", err: "Réponse du serveur Supercell" },
 		it: { sel: "SCEGLI FILE SPCFG", sav: "SALVATAGGIO...", ok: "✓ SALVATO!", cd: "Limite giornaliero raggiunto. Attendi.", nd: "Nessun dato trovato!", inv: "Errore: Sono accettati solo file .spcfg validi!", err: "Risposta server Supercell" },
 		pt: { sel: "ESCOLHER ARQUIVO SPCFG", sav: "SALVANDO...", ok: "✓ SALVO!", cd: "Limite diário atingido. Por favor aguarde.", nd: "Nenhum dato encontrado!", inv: "Erro: Apenas arquivos .spcfg válidos são aceitos!", err: "Resposta do servidor Supercell" },
-		ru: { sel: "ВЫБРАТЬ ФAЙЛ SPCFG", sav: "СОХРАНЕНИЕ...", ok: "✓ СОХРАНЕНО!", cd: "Дневной лимит исчерпан. Пожалуйста, подождите.", nd: "Данные пина не найдены!", inv: "Ошибка: Принимаются только корректные файлы .spcfg!", err: "Ответ сервера Supercell" },
+		ru: { sel: "ВЫБРАТЬ ФАЙЛ SPCFG", sav: "СОХРАНЕНИЕ...", ok: "✓ СОХРАНЕНО!", cd: "Дневной лимит исчерпан. Пожалуйста, подождите.", nd: "Данные пина не найдены!", inv: "Ошибка: Принимаются только корректные файлы .spcfg!", err: "Ответ сервера Supercell" },
 		pl: { sel: "WYBIERZ PLIK SPCFG", sav: "ZAPISYWANIE...", ok: "✓ ZAPISANO!", cd: "Osiągnięto dzienny limit. Proszę czekać.", nd: "Nie znaleziono danych!", inv: "Błąd: Akceptowane są tylko prawidłowe pliki .spcfg!", err: "Odpowiedź serwera Supercell" },
 		jp: { sel: "SPCFGファイルを選択", sav: "保存中...", ok: "✓ 保存完了！", cd: "1日の保存制限に達しました。お待ちください。", nd: "データが見つかりません！", inv: "エラー: 有効な .spcfg ファイルのみ受け入れられます！", err: "Supercellサーバーの応答" },
 		kr: { sel: "SPCFG 파일 선택", sav: "저장 중...", ok: "✓ 저장 완료!", cd: "일일 저장 한도에 도달했습니다. 잠시 기다려주세요.", nd: "데이터를 찾을 수 없습니다!", inv: "오류: 유효한 .spcfg 파일만 업로드할 수 있습니다!", err: "Supercell 서버 응답" },

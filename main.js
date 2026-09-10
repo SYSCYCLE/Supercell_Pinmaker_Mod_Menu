@@ -2,31 +2,31 @@
 	if (window.__pmObserver) window.__pmObserver.disconnect();
 
 	const L = {
-		tr: { sel: "SPCFG DOSYASI SEÇ", sav: "KAYDEDİLİYOR...", ok: "✓ KAYDEDİLDİ!", cd: "Günlük rozet kaydetme kotanız dolmuştur. Lütfen sürenin bitmesini bekleyin.", nd: "Kaydedilecek rozet verisi bulunamadı!", inv: "Hata: Geçersiz veya şifresi çözülemeyen SPCFG dosyası!", err: "Supercell Sunucu Yanıtı" },
-		en: { sel: "SELECT SPCFG FILE", sav: "SAVING...", ok: "✓ SAVED!", cd: "Daily pin upload limit reached. Please wait for cooldown.", nd: "No pin data found to save!", inv: "Error: Invalid or corrupted SPCFG file!", err: "Supercell Server Response" },
-		es: { sel: "ELEGIR ARCHIVO SPCFG", sav: "GUARDANDO...", ok: "✓ ¡GUARDADO!", cd: "Límite diario alcanzado. Por favor espera.", nd: "¡No se encontraron datos!", inv: "¡Error: Archivo SPCFG no válido!", err: "Respuesta del servidor Supercell" },
-		de: { sel: "SPCFG-DATEI WÄHLEN", sav: "SPEICHERN...", ok: "✓ GESPEICHERT!", cd: "Tägliches Limit erreicht. Bitte warten.", nd: "Keine Daten gefunden!", inv: "Fehler: Ungültige SPCFG-Datei!", err: "Supercell-Serverantwort" },
-		fr: { sel: "CHOISIR FICHIER SPCFG", sav: "ENREGISTREMENT...", ok: "✓ ENREGISTRÉ !", cd: "Limite quotidienne atteinte. Veuillez patienter.", nd: "Aucune donnée trouvée !", inv: "Erreur : Fichier SPCFG invalide !", err: "Réponse du serveur Supercell" },
-		it: { sel: "SCEGLI FILE SPCFG", sav: "SALVATAGGIO...", ok: "✓ SALVATO!", cd: "Limite giornaliero raggiunto. Attendi.", nd: "Nessun dato trovato!", inv: "Errore: File SPCFG non valido!", err: "Risposta server Supercell" },
-		pt: { sel: "ESCOLHER ARQUIVO SPCFG", sav: "SALVANDO...", ok: "✓ SALVO!", cd: "Limite diário atingido. Por favor aguarde.", nd: "Nenhum dato encontrado!", inv: "Erro: Arquivo SPCFG inválido!", err: "Resposta do servidor Supercell" },
-		ru: { sel: "ВЫБРАТЬ ФАЙЛ SPCFG", sav: "СОХРАНЕНИЕ...", ok: "✓ СОХРАНЕНО!", cd: "Дневной лимит исчерпан. Пожалуйста, подождите.", nd: "Данные пина не найдены!", inv: "Ошибка: Неверный файл SPCFG!", err: "Ответ сервера Supercell" },
-		pl: { sel: "WYBIERZ PLIK SPCFG", sav: "ZAPISYWANIE...", ok: "✓ ZAPISANO!", cd: "Osiągnięto dzienny limit. Proszę czekać.", nd: "Nie znaleziono danych!", inv: "Błąd: Nieprawidłowy plik SPCFG!", err: "Odpowiedź serwera Supercell" },
-		jp: { sel: "SPCFGファイルを選択", sav: "保存中...", ok: "✓ 保存完了！", cd: "1日の保存制限に達しました。お待ちください。", nd: "データが見つかりません！", inv: "エラー: 無効なSPCFGファイルです！", err: "Supercellサーバーの応答" },
-		kr: { sel: "SPCFG 파일 선택", sav: "저장 중...", ok: "✓ 저장 완료!", cd: "일일 저장 한도에 도달했습니다. 잠시 기다려주세요.", nd: "데이터를 찾을 수 없습니다!", inv: "오류: 유효하지 않은 SPCFG 파일입니다!", err: "Supercell 서버 응답" },
-		"zh-hans": { sel: "选择 SPCFG 文件", sav: "保存中...", ok: "✓ 已保存！", cd: "已达到每日保存限制。请稍候。", nd: "未找到可保存的数据！", inv: "错误：无效的 SPCFG 文件！", err: "Supercell 服务器响应" },
-		"zh-hant": { sel: "選擇 SPCFG 檔案", sav: "儲存中...", ok: "✓ 已儲存！", cd: "已達每日儲存上限。請稍候。", nd: "找不到可儲存的資料！", inv: "錯誤：無效的 SPCFG 檔案！", err: "Supercell 伺服器回應" },
-		ar: { sel: "اختر ملف SPCFG", sav: "جارٍ الحفظ...", ok: "✓ تم الحفظ!", cd: "تم الوصول إلى الحد اليومي. يرجى الانتظار.", nd: "لم يتم العثور على بيانات!", inv: "خطأ: ملف SPCFG غير صالح!", err: "استجابة خادم Supercell" },
-		da: { sel: "VÆLG SPCFG-FIL", sav: "GEMMER...", ok: "✓ GEMT!", cd: "Daglig grænse nået.", nd: "Ingen data fundet!", inv: "Ugyldig SPCFG-fil!", err: "Supercell-serversvar" },
-		nl: { sel: "KIES SPCFG-BESTAND", sav: "OPSLAAN...", ok: "✓ OPGESLAGEN!", cd: "Dagelijkse limiet bereikt.", nd: "Geen gegevens gevonden!", inv: "Ongeldig SPCFG-bestand!", err: "Supercell-serverreactie" },
-		fi: { sel: "VALITSE SPCFG-TIEDOSTO", sav: "TALLENNETAAN...", ok: "✓ TALLENNETTU!", cd: "Päivittäinen raja saavutettu.", nd: "Tietoja ei löytynyt!", inv: "Virheellinen SPCFG-tiedosto!", err: "Supercell-palvelinvastaus" },
-		sv: { sel: "VÄLJ SPCFG-FIL", sav: "SPARAR...", ok: "✓ SPARAD!", cd: "Daglig gräns nådd.", nd: "Ingen data hittades!", inv: "Ogiltig SPCFG-fil!", err: "Supercell-serversvar" },
-		no: { sel: "VELG SPCFG-FIL", sav: "LAGRER...", ok: "✓ LAGRET!", cd: "Daglig grense nådd.", nd: "Ingen data funnet!", inv: "Ugyldig SPCFG-fil!", err: "Supercell-serversvar" },
-		th: { sel: "เลือกไฟล์ SPCFG", sav: "กำลังบันทึก...", ok: "✓ บันทึกแล้ว!", cd: "ถึงขีดจำกัดรายวันแล้ว", nd: "ไม่พบข้อมูล!", inv: "ไฟล์ SPCFG ไม่ถูกต้อง!", err: "การตอบกลับของเซิร์ฟเวอร์ Supercell" },
-		vi: { sel: "CHỌN TỆP SPCFG", sav: "ĐANG LƯU...", ok: "✓ ĐÃ LƯU!", cd: "Đã đạt giới hạn hàng ngày.", nd: "Không tìm thấy dữ liệu!", inv: "Tệp SPCFG không hợp lệ!", err: "Phản hồi máy chủ Supercell" },
-		id: { sel: "PILIH FILE SPCFG", sav: "MENYIMPAN...", ok: "✓ TERSIMPAN!", cd: "Batas harian tercapai.", nd: "Data tidak ditemukan!", inv: "File SPCFG tidak valid!", err: "Respons Server Supercell" },
-		ms: { sel: "PILIH FAIL SPCFG", sav: "MENYIMPAN...", ok: "✓ DISIMPAN!", cd: "Had harian dicapai.", nd: "Data tidak dijumpai!", inv: "Fail SPCFG tidak sah!", err: "Respons Pelayan Supercell" },
-		he: { sel: "בחר קובץ SPCFG", sav: "...שומר", ok: "!נשמר ✓", cd: "הגעת למגבלה היומית.", nd: "!לא נמצאו נתונים", inv: "!שגוי SPCFG קובץ", err: "Supercell תגובת שרת" },
-		fa: { sel: "انتخاب فایل SPCFG", sav: "...در حال ذخیره", ok: "!ذخیره شد ✓", cd: "محدودیت روزانه پر شده است.", nd: "!داده‌ای یافت نشد", inv: "نامعتبر است SPCFG فایل", err: "Supercell پاسخ سرور" }
+		tr: { sel: "SPCFG DOSYASI SEÇ", sav: "KAYDEDİLİYOR...", ok: "✓ KAYDEDİLDİ!", cd: "Günlük rozet kaydetme kotanız dolmuştur. Lütfen sürenin bitmesini bekleyin.", nd: "Kaydedilecek rozet verisi bulunamadı!", inv: "Hata: Yalnızca geçerli şifreli .spcfg dosyaları yüklenebilir!", err: "Supercell Sunucu Yanıtı" },
+		en: { sel: "SELECT SPCFG FILE", sav: "SAVING...", ok: "✓ SAVED!", cd: "Daily pin upload limit reached. Please wait for cooldown.", nd: "No pin data found to save!", inv: "Error: Only valid encrypted .spcfg files are accepted!", err: "Supercell Server Response" },
+		es: { sel: "ELEGIR ARCHIVO SPCFG", sav: "GUARDANDO...", ok: "✓ ¡GUARDADO!", cd: "Límite diario alcanzado. Por favor espera.", nd: "¡No se encontraron datos!", inv: "¡Error: Solo se aceptan archivos .spcfg cifrados válidos!", err: "Respuesta del servidor Supercell" },
+		de: { sel: "SPCFG-DATEI WÄHLEN", sav: "SPEICHERN...", ok: "✓ GESPEICHERT!", cd: "Tägliches Limit erreicht. Bitte warten.", nd: "Keine Daten gefunden!", inv: "Fehler: Nur gültige verschlüsselte .spcfg-Dateien werden akzeptiert!", err: "Supercell-Serverantwort" },
+		fr: { sel: "CHOISIR FICHIER SPCFG", sav: "ENREGISTREMENT...", ok: "✓ ENREGISTRÉ !", cd: "Limite quotidienne atteinte. Veuillez patienter.", nd: "Aucune donnée trouvée !", inv: "Erreur : Seuls les fichiers .spcfg chiffrés sont acceptés !", err: "Réponse du serveur Supercell" },
+		it: { sel: "SCEGLI FILE SPCFG", sav: "SALVATAGGIO...", ok: "✓ SALVATO!", cd: "Limite giornaliero raggiunto. Attendi.", nd: "Nessun dato trovato!", inv: "Errore: Sono accettati solo file .spcfg crittografati validi!", err: "Risposta server Supercell" },
+		pt: { sel: "ESCOLHER ARQUIVO SPCFG", sav: "SALVANDO...", ok: "✓ SALVO!", cd: "Limite diário atingido. Por favor aguarde.", nd: "Nenhum dato encontrado!", inv: "Erro: Apenas arquivos .spcfg criptografados válidos são aceitos!", err: "Resposta do servidor Supercell" },
+		ru: { sel: "ВЫБРАТЬ ФАЙЛ SPCFG", sav: "СОХРАНЕНИЕ...", ok: "✓ СОХРАНЕНО!", cd: "Дневной лимит исчерпан. Пожалуйста, подождите.", nd: "Данные пина не найдены!", inv: "Ошибка: Принимаются только зашифрованные файлы .spcfg!", err: "Ответ сервера Supercell" },
+		pl: { sel: "WYBIERZ PLIK SPCFG", sav: "ZAPISYWANIE...", ok: "✓ ZAPISANO!", cd: "Osiągnięto dzienny limit. Proszę czekać.", nd: "Nie znaleziono danych!", inv: "Błąd: Akceptowane są tylko prawidłowe pliki .spcfg!", err: "Odpowiedź serwera Supercell" },
+		jp: { sel: "SPCFGファイルを選択", sav: "保存中...", ok: "✓ 保存完了！", cd: "1日の保存制限に達しました。お待ちください。", nd: "データが見つかりません！", inv: "エラー: 有効な暗号化された .spcfg ファイルのみ受け入れられます！", err: "Supercellサーバーの応答" },
+		kr: { sel: "SPCFG 파일 선택", sav: "저장 중...", ok: "✓ 저장 완료!", cd: "일일 저장 한도에 도달했습니다. 잠시 기다려주세요.", nd: "데이터를 찾을 수 없습니다!", inv: "오류: 암호화된 .spcfg 파일만 업로드할 수 있습니다!", err: "Supercell 서버 응답" },
+		"zh-hans": { sel: "选择 SPCFG 文件", sav: "保存中...", ok: "✓ 已保存！", cd: "已达到每日保存限制。请稍候。", nd: "未找到可保存的数据！", inv: "错误：仅支持有效的加密 .spcfg 文件！", err: "Supercell 服务器响应" },
+		"zh-hant": { sel: "選擇 SPCFG 檔案", sav: "儲存中...", ok: "✓ 已儲存！", cd: "已達每日儲存上限。請稍候。", nd: "找不到可儲存的資料！", inv: "錯誤：僅支援有效的加密 .spcfg 檔案！", err: "Supercell 伺服器回應" },
+		ar: { sel: "اختر ملف SPCFG", sav: "جارٍ الحفظ...", ok: "✓ تم الحفظ!", cd: "تم الوصول إلى الحد اليومي. يرجى الانتظار.", nd: "لم يتم العثور على بيانات!", inv: "خطأ: يتم قبول ملفات .spcfg المشفرة الصالحة فقط!", err: "استجابة خادم Supercell" },
+		da: { sel: "VÆLG SPCFG-FIL", sav: "GEMMER...", ok: "✓ GEMT!", cd: "Daglig grænse nået.", nd: "Ingen data fundet!", inv: "Kun krypterede .spcfg-filer accepteres!", err: "Supercell-serversvar" },
+		nl: { sel: "KIES SPCFG-BESTAND", sav: "OPSLAAN...", ok: "✓ OPGESLAGEN!", cd: "Dagelijkse limiet bereikt.", nd: "Geen gegevens gevonden!", inv: "Alleen gecodeerde .spcfg-bestanden worden geaccepteerd!", err: "Supercell-serverreactie" },
+		fi: { sel: "VALITSE SPCFG-TIEDOSTO", sav: "TALLENNETAAN...", ok: "✓ TALLENNETTU!", cd: "Päivittäinen raja saavutettu.", nd: "Tietoja ei löytynyt!", inv: "Vain salattuja .spcfg-tiedostoja hyväksytään!", err: "Supercell-palvelinvastaus" },
+		sv: { sel: "VÄLJ SPCFG-FIL", sav: "SPARAR...", ok: "✓ SPARAD!", cd: "Daglig gräns nådd.", nd: "Ingen data hittades!", inv: "Endast krypterade .spcfg-filer accepteras!", err: "Supercell-serversvar" },
+		no: { sel: "VELG SPCFG-FIL", sav: "LAGRER...", ok: "✓ LAGRET!", cd: "Daglig grense nådd.", nd: "Ingen data funnet!", inv: "Bare krypterte .spcfg-filer godtas!", err: "Supercell-serversvar" },
+		th: { sel: "เลือกไฟล์ SPCFG", sav: "กำลังบันทึก...", ok: "✓ บันทึกแล้ว!", cd: "ถึงขีดจำกัดรายวันแล้ว", nd: "ไม่พบข้อมูล!", inv: "ยอมรับเฉพาะไฟล์ .spcfg ที่เข้ารหัสเท่านั้น!", err: "การตอบกลับของเซิร์ฟเวอร์ Supercell" },
+		vi: { sel: "CHỌN TỆP SPCFG", sav: "ĐANG LƯU...", ok: "✓ ĐÃ LƯU!", cd: "Đã đạt giới hạn hàng ngày.", nd: "Không tìm thấy dữ liệu!", inv: "Chỉ chấp nhận các tệp .spcfg được mã hóa hợp lệ!", err: "Phản hồi máy chủ Supercell" },
+		id: { sel: "PILIH FILE SPCFG", sav: "MENYIMPAN...", ok: "✓ TERSIMPAN!", cd: "Batas harian tercapai.", nd: "Data tidak ditemukan!", inv: "Hanya file .spcfg terenkripsi yang diterima!", err: "Respons Server Supercell" },
+		ms: { sel: "PILIH FAIL SPCFG", sav: "MENYIMPAN...", ok: "✓ DISIMPAN!", cd: "Had harian dicapai.", nd: "Data tidak dijumpai!", inv: "Hanya fail .spcfg yang disulitkan diterima!", err: "Respons Pelayan Supercell" },
+		he: { sel: "בחר קובץ SPCFG", sav: "...שומר", ok: "!נשמר ✓", cd: "הגעת למגבלה היומית.", nd: "!לא נמצאו נתונים", inv: "בלבד .spcfg מתקבלים קובצי", err: "Supercell תגובת שרת" },
+		fa: { sel: "انتخاب فایل SPCFG", sav: "...در حال ذخیره", ok: "!ذخیره شد ✓", cd: "محدودیت روزانه پر شده است.", nd: "!داده‌ای یافت نشد", inv: "معتبر پذیرفته می‌شوند .spcfg فقط فایل‌های رمزگذاری‌شده", err: "Supercell پاسخ سرور" }
 	};
 
 	function getLang() {
@@ -67,9 +67,10 @@
 
 	async function decryptFromRaw(rawBuffer) {
 		let bytes = new Uint8Array(rawBuffer);
-		if (bytes.length >= 2 && bytes[0] === 0x00 && bytes[1] === 0x01) {
-			bytes = bytes.slice(2);
+		if (bytes.length < 2 || bytes[0] !== 0x00 || bytes[1] !== 0x01) {
+			throw new Error('Not an encrypted SPCFG');
 		}
+		bytes = bytes.slice(2);
 		const b64Str = new TextDecoder().decode(bytes).trim();
 		const key = await getCryptoKey();
 		const binary = atob(b64Str);
@@ -84,7 +85,7 @@
 	if (!document.getElementById('pm-marquee-style')) {
 		const st = document.createElement('style');
 		st.id = 'pm-marquee-style';
-		st.textContent = '@keyframes pmMarqueeAnim{0%,20%{transform:translateX(0%)}80%,100%{transform:translateX(calc(-100% + 180px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;animation:pmMarqueeAnim 6s ease-in-out infinite alternate!important}';
+		st.textContent = '@keyframes pmMarqueeAnim{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(calc(-100% + 160px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;animation:pmMarqueeAnim 5s ease-in-out infinite alternate!important}';
 		document.head.appendChild(st);
 	}
 
@@ -399,7 +400,7 @@
 		fileInput = document.createElement('input');
 		fileInput.id = 'pm-hidden-file-input';
 		fileInput.type = 'file';
-		fileInput.accept = '.spcfg,.json,.txt,*/*';
+		fileInput.accept = '.spcfg';
 		fileInput.style.display = 'none';
 		document.body.appendChild(fileInput);
 	}
@@ -418,25 +419,32 @@
 	function updateLabel(flbl, text) {
 		if (!flbl) return;
 		const defaultText = tr('sel');
-		if (!window.__customPinFileName || text === defaultText) {
-			flbl.classList.remove('pm-marquee-active');
-			flbl.style.cssText = 'width:100%!important;text-align:center!important;display:block!important;margin:0 auto!important;';
-			if (flbl.parentElement) {
-				flbl.parentElement.style.cssText = 'width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;overflow:hidden!important;margin:0 auto!important;';
-			}
-			flbl.textContent = defaultText;
+		const isFile = !!window.__customPinFileName && text !== defaultText;
+
+		const bg = flbl.closest('.RectangleButton__background');
+		if (bg) {
+			bg.style.overflow = 'hidden';
+			bg.style.padding = '0 10px';
+		}
+
+		const pBox = flbl.closest('.pickedLabel__container') || flbl.parentElement;
+		if (pBox) {
+			pBox.style.cssText = 'width:160px!important;max-width:160px!important;min-width:0!important;overflow:hidden!important;display:flex!important;align-items:center!important;margin:0 auto!important;';
+		}
+
+		const pl = flbl.closest('.pickedLabel');
+		if (pl) {
+			pl.style.cssText = 'width:160px!important;max-width:160px!important;overflow:hidden!important;margin:0 auto!important;';
+		}
+
+		if (isFile && text.length > 14) {
+			if (pBox) pBox.style.justifyContent = 'flex-start';
+			flbl.style.cssText = 'display:inline-block!important;overflow:visible!important;white-space:nowrap!important;';
+			flbl.innerHTML = '<span class="pm-marquee-active">' + text + '</span>';
 		} else {
-			if (flbl.parentElement) {
-				flbl.parentElement.style.cssText = 'width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;overflow:hidden!important;margin:0 auto!important;';
-			}
-			if (text.length > 18) {
-				flbl.style.cssText = 'width:100%!important;text-align:left!important;display:block!important;overflow:hidden!important;margin:0 auto!important;';
-				flbl.innerHTML = '<span class="pm-marquee-active">' + text + '</span>';
-			} else {
-				flbl.classList.remove('pm-marquee-active');
-				flbl.style.cssText = 'width:100%!important;text-align:center!important;display:block!important;margin:0 auto!important;';
-				flbl.textContent = text;
-			}
+			if (pBox) pBox.style.justifyContent = 'center';
+			flbl.style.cssText = 'width:100%!important;text-align:center!important;display:block!important;white-space:nowrap!important;overflow:hidden!important;';
+			flbl.textContent = text;
 		}
 	}
 
@@ -533,8 +541,7 @@
 				myPickerBtn.id = 'pm-json-picker-btn';
 				myPickerBtn.style.marginTop = '14px';
 				const flbl = myPickerBtn.querySelector('.pickedLabel__label');
-				const currentDisplayName = window.__customPinFileName ? ('✓ ' + window.__customPinFileName.replace(/\.txt$/i, '')) : tr('sel');
-				updateLabel(flbl, currentDisplayName);
+				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName) : tr('sel'));
 
 				myPickerBtn.onclick = function (e) {
 					e.preventDefault();
@@ -556,6 +563,15 @@
 						updateLabel(flbl, tr('sel'));
 						return;
 					}
+
+					if (!f.name.toLowerCase().endsWith('.spcfg')) {
+						alert(tr('inv'));
+						window.__customPinPayload = null;
+						window.__customPinFileName = null;
+						updateLabel(flbl, tr('sel'));
+						return;
+					}
+
 					const r = new FileReader();
 					r.onload = async function (eRes) {
 						const buffer = eRes.target.result;
@@ -564,20 +580,15 @@
 							const decryptedText = await decryptFromRaw(buffer);
 							parsedData = JSON.parse(decryptedText);
 						} catch (decErr) {
-							try {
-								const fallbackStr = new TextDecoder().decode(buffer);
-								parsedData = JSON.parse(fallbackStr);
-							} catch (jsonErr) {
-								alert(tr('inv'));
-								window.__customPinPayload = null;
-								window.__customPinFileName = null;
-								updateLabel(flbl, tr('sel'));
-								return;
-							}
+							alert(tr('inv'));
+							window.__customPinPayload = null;
+							window.__customPinFileName = null;
+							updateLabel(flbl, tr('sel'));
+							return;
 						}
 						window.__customPinPayload = parsedData;
-						window.__customPinFileName = f.name.replace(/\.txt$/i, '');
-						updateLabel(flbl, '✓ ' + window.__customPinFileName);
+						window.__customPinFileName = f.name;
+						updateLabel(flbl, '✓ ' + f.name);
 					};
 					r.readAsArrayBuffer(f);
 				};

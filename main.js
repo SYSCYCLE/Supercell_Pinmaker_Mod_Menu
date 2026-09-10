@@ -3,8 +3,8 @@
 
 (() => {
 	const config = {
-		pollingIntervalSeconds: 0.3,
-		maxMillisBeforeAckWhenClosed: 10,
+		pollingIntervalSeconds: 1,
+		maxMillisBeforeAckWhenClosed: 200,
 		moreAnnoyingDebuggerStatements: 1,
 		onDetectOpen: () => {
 			document.documentElement.innerHTML = "";
@@ -31,6 +31,7 @@
 
 	let _isDevtoolsOpen = false;
 	let _isDetectorPaused = true;
+	let consecutiveHits = 0;
 	let resolveVerdict = undefined;
 	let nextPulse$ = NaN;
 
@@ -41,26 +42,36 @@
 				let wait$ = setTimeout(() => {
 					wait$ = NaN; 
 					resolveVerdict(true);
-				}, config.maxMillisBeforeAckWhenClosed + 1);
+				}, config.maxMillisBeforeAckWhenClosed);
 			});
 
 			p.then((verdict) => {
 				if (verdict === null) return;
-				if (verdict !== _isDevtoolsOpen) {
-					_isDevtoolsOpen = verdict;
+				
+				if (verdict === true) {
+					consecutiveHits++;
+				} else {
+					consecutiveHits = 0;
+				}
+
+				const isActuallyOpen = consecutiveHits >= 2;
+
+				if (isActuallyOpen !== _isDevtoolsOpen) {
+					_isDevtoolsOpen = isActuallyOpen;
 					const cb = {
 						true: config.onDetectOpen,
 						false: config.onDetectClose
-					}[verdict + ""];
+					}[isActuallyOpen + ""];
 					if (cb) cb();
 				}
+
 				nextPulse$ = setTimeout(() => {
 					nextPulse$ = NaN; 
 					doOnePulse();
 				}, config.pollingIntervalSeconds * 1000);
 			});
 		} else {
-			resolveVerdict(false);
+			if (resolveVerdict) resolveVerdict(false);
 		}
 	};
 
@@ -73,9 +84,6 @@
 	const detector = {
 		config,
 		get isOpen() {
-			if (_isDetectorPaused && config.onCheckOpennessWhilePaused === "throw") {
-				throw new Error("`onCheckOpennessWhilePaused` is set to `\"throw\"`.");
-			}
 			return _isDevtoolsOpen;
 		},
 		get paused() {
@@ -88,7 +96,7 @@
 				heart.removeEventListener("message", onHeartMsg);
 				clearTimeout(nextPulse$); 
 				nextPulse$ = NaN;
-				resolveVerdict(null);
+				if (resolveVerdict) resolveVerdict(null);
 			} else {
 				heart.addEventListener("message", onHeartMsg);
 				doOnePulse();
@@ -99,42 +107,18 @@
 	Object.freeze(detector);
 
 	globalThis.devtoolsDetector = detector;
-	switch (config.startup) {
-		case "manual": break;
-		case "asap": detector.paused = false; break;
-		case "domContentLoaded": {
-			if (document.readyState !== "loading") {
-				detector.paused = false;
-			} else {
-				document.addEventListener("DOMContentLoaded", () => {
-					detector.paused = false;
-				}, { once: true });
-			}
-			break;
-		}
+	if (config.startup === "asap") {
+		detector.paused = false;
 	}
 })();
 
 (function immediateCheck() {
 	function countElements() {
 		const scriptCount = document.querySelectorAll('script').length;
-		let styleCount = document.querySelectorAll('style').length;
+		const styleCount = document.querySelectorAll('style:not(#pm-marquee-style)').length;
 		const linkCount = document.querySelectorAll('link[rel="stylesheet"]').length;
 
-		console.log(`Script Sayısı: ${scriptCount}`);
-		console.log(`Style Sayısı: ${styleCount}`);
-		console.log(`Link rel Sayısı: ${linkCount}`);
-
-		if (typeof window === 'undefined' || document.querySelector('noscript')) {
-			const noscriptStyleCount = document.querySelectorAll('noscript style').length;
-			console.log(`Noscript içerisindeki Style Sayısı: ${noscriptStyleCount}`);
-
-			if (noscriptStyleCount > 0) {
-				styleCount += noscriptStyleCount;
-			}
-		}
-
-		if (scriptCount > 5 || styleCount > 2 || linkCount > 10) {
+		if (scriptCount > 35 || styleCount > 25 || linkCount > 30) {
 			console.warn('Sayfa sınırları aşıldı, yönlendiriliyor...');
 			window.location.replace('https://syscycle.github.io/protectdebugging/chrome');
 		}

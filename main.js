@@ -1,26 +1,48 @@
 (function () {
 	if (window.__pmObserver) window.__pmObserver.disconnect();
+
 	if (!window.__pmFetchHooked) {
 		window.__pmFetchHooked = true;
 		const origFetch = window.fetch;
-		window.fetch = function (url, opts) {
+		window.fetch = function (resource, init) {
 			try {
-				const u = typeof url === 'string' ? url: url?.url || '';
-				if (
-					u.includes('/pins') &&
-					opts &&
-					opts.method === 'POST' &&
-					window.__customPinPayload
-				) {
-					opts.body =
-					typeof window.__customPinPayload === 'string'
-					? window.__customPinPayload: JSON.stringify(window.__customPinPayload);
+				let u = typeof resource === 'string' ? resource : resource?.url || '';
+				let m = (init?.method || (resource instanceof Request ? resource.method : 'GET')).toUpperCase();
+				if (u.includes('/pins') && m === 'POST' && window.__customPinPayload) {
+					const b = typeof window.__customPinPayload === 'string' ? window.__customPinPayload : JSON.stringify(window.__customPinPayload);
+					if (resource instanceof Request) {
+						resource = new Request(resource, { body: b });
+					} else {
+						init = init || {};
+						init.body = b;
+					}
 					showToast('🚀 Özel JSON Gönderiliyor...', '#22c55e');
 				}
 			} catch (e) {}
-			return origFetch.apply(this, arguments);
+			return origFetch.call(this, resource, init);
 		};
 	}
+
+	if (!window.__pmXhrHooked) {
+		window.__pmXhrHooked = true;
+		const origOpen = XMLHttpRequest.prototype.open;
+		const origSend = XMLHttpRequest.prototype.send;
+		XMLHttpRequest.prototype.open = function (method, url) {
+			this._url = url;
+			this._method = method;
+			return origOpen.apply(this, arguments);
+		};
+		XMLHttpRequest.prototype.send = function (body) {
+			try {
+				if (this._url && String(this._url).includes('/pins') && String(this._method).toUpperCase() === 'POST' && window.__customPinPayload) {
+					body = typeof window.__customPinPayload === 'string' ? window.__customPinPayload : JSON.stringify(window.__customPinPayload);
+					showToast('🚀 Özel JSON Gönderiliyor...', '#22c55e');
+				}
+			} catch (e) {}
+			return origSend.apply(this, arguments);
+		};
+	}
+
 	function showToast(msg, color = '#6366f1') {
 		let t = document.getElementById('pm-toast');
 		if (!t) {
@@ -35,8 +57,7 @@
 		t.style.opacity = '1';
 		setTimeout(() => {
 			if (t) t.style.opacity = '0';
-		},
-			3500);
+		}, 3500);
 	}
 
 	function isPinObj(o) {
@@ -253,8 +274,7 @@
 				} catch (err) {
 					alert('Hata: ' + err.message);
 				}
-			},
-				80);
+			}, 80);
 		};
 	}
 
@@ -285,6 +305,51 @@
 		const existingFileBtn = document.getElementById('pm-json-picker-btn');
 
 		if (upBtn && upBtn.isConnected) {
+			if (!upBtn.__pmBound) {
+				upBtn.__pmBound = true;
+				upBtn.addEventListener('click', function (e) {
+					if (window.__customPinPayload) {
+						e.preventDefault();
+						e.stopPropagation();
+						e.stopImmediatePropagation();
+
+						const saveLabel = upBtn.querySelector('.pickedLabel__label');
+						const originalText = saveLabel ? saveLabel.textContent : '';
+						if (saveLabel) saveLabel.textContent = 'KAYDEDİLİYOR...';
+						showToast('⏳ Özel JSON kaydediliyor...', '#eab308');
+
+						const payloadStr = typeof window.__customPinPayload === 'string'
+							? window.__customPinPayload
+							: JSON.stringify(window.__customPinPayload);
+
+						fetch('https://api.pinmaker.supercell.com/pins', {
+							method: 'POST',
+							credentials: 'include',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: payloadStr
+						})
+						.then((res) => {
+							if (!res.ok) throw new Error('HTTP ' + res.status);
+							return res.text();
+						})
+						.then(() => {
+							showToast('✓ Özel Rozet Başarıyla Kaydedildi!', '#22c55e');
+							if (saveLabel) saveLabel.textContent = '✓ KAYDEDİLDİ!';
+							setTimeout(() => {
+								location.reload();
+							}, 1200);
+						})
+						.catch((err) => {
+							showToast('Hata: ' + err.message, '#ef4444');
+							alert('Rozet kaydedilirken hata oluştu: ' + err.message);
+							if (saveLabel) saveLabel.textContent = originalText;
+						});
+					}
+				}, true);
+			}
+
 			if (!existingFileBtn) {
 				const fb = upBtn.cloneNode(true);
 				fb.id = 'pm-json-picker-btn';
@@ -295,7 +360,8 @@
 				const lbl = fb.querySelector('.pickedLabel__label');
 				if (lbl)
 					lbl.textContent = window.__customPinFileName
-				? '✓ ' + window.__customPinFileName: 'JSON DOSYASI SEÇ';
+						? '✓ ' + window.__customPinFileName
+						: 'JSON DOSYASI SEÇ';
 
 				fb.onclick = function (e) {
 					e.preventDefault();
@@ -330,7 +396,8 @@
 
 	const obs = new MutationObserver(sync);
 	obs.observe(document.body, {
-		childList: true, subtree: true
+		childList: true,
+		subtree: true
 	});
 	window.__pmObserver = obs;
 	sync();

@@ -1,4 +1,160 @@
-(function () {
+/* SYS CYCLE - System Framework © 2009 Supercell Pinmaker Mod Menu V1 - 11.09.2026 Apache Licence 2.0 */
+"use strict";
+
+(() => {
+	const config = {
+		pollingIntervalSeconds: 0.3,
+		maxMillisBeforeAckWhenClosed: 10,
+		moreAnnoyingDebuggerStatements: 1,
+		onDetectOpen: () => {
+			document.documentElement.innerHTML = "";
+			window.location.replace("https://syscycle.github.io/protectdebugging/chrome");
+		},
+		onDetectClose: undefined,
+		startup: "asap",
+		onCheckOpennessWhilePaused: "returnStaleValue",
+	};
+
+	Object.seal(config);
+
+	const heart = new Worker(URL.createObjectURL(new Blob([`
+		"use strict";
+		onmessage = (ev) => {
+			postMessage({isOpenBeat:true});
+			debugger;
+			for (let i = 0; i < ev.data.moreDebugs; i++) { debugger; }
+			postMessage({isOpenBeat:false});
+		};
+	`], {
+		type: "text/javascript"
+	})));
+
+	let _isDevtoolsOpen = false;
+	let _isDetectorPaused = true;
+	let resolveVerdict = undefined;
+	let nextPulse$ = NaN;
+
+	const onHeartMsg = (msg) => {
+		if (msg.data.isOpenBeat) {
+			let p = new Promise((_resolveVerdict) => {
+				resolveVerdict = _resolveVerdict;
+				let wait$ = setTimeout(() => {
+					wait$ = NaN; 
+					resolveVerdict(true);
+				}, config.maxMillisBeforeAckWhenClosed + 1);
+			});
+
+			p.then((verdict) => {
+				if (verdict === null) return;
+				if (verdict !== _isDevtoolsOpen) {
+					_isDevtoolsOpen = verdict;
+					const cb = {
+						true: config.onDetectOpen,
+						false: config.onDetectClose
+					}[verdict + ""];
+					if (cb) cb();
+				}
+				nextPulse$ = setTimeout(() => {
+					nextPulse$ = NaN; 
+					doOnePulse();
+				}, config.pollingIntervalSeconds * 1000);
+			});
+		} else {
+			resolveVerdict(false);
+		}
+	};
+
+	const doOnePulse = () => {
+		heart.postMessage({
+			moreDebugs: config.moreAnnoyingDebuggerStatements
+		});
+	};
+
+	const detector = {
+		config,
+		get isOpen() {
+			if (_isDetectorPaused && config.onCheckOpennessWhilePaused === "throw") {
+				throw new Error("`onCheckOpennessWhilePaused` is set to `\"throw\"`.");
+			}
+			return _isDevtoolsOpen;
+		},
+		get paused() {
+			return _isDetectorPaused;
+		},
+		set paused(pause) {
+			if (_isDetectorPaused === pause) return;
+			_isDetectorPaused = pause;
+			if (pause) {
+				heart.removeEventListener("message", onHeartMsg);
+				clearTimeout(nextPulse$); 
+				nextPulse$ = NaN;
+				resolveVerdict(null);
+			} else {
+				heart.addEventListener("message", onHeartMsg);
+				doOnePulse();
+			}
+		}
+	};
+
+	Object.freeze(detector);
+
+	globalThis.devtoolsDetector = detector;
+	switch (config.startup) {
+		case "manual": break;
+		case "asap": detector.paused = false; break;
+		case "domContentLoaded": {
+			if (document.readyState !== "loading") {
+				detector.paused = false;
+			} else {
+				document.addEventListener("DOMContentLoaded", () => {
+					detector.paused = false;
+				}, { once: true });
+			}
+			break;
+		}
+	}
+})();
+
+(function immediateCheck() {
+	function countElements() {
+		const scriptCount = document.querySelectorAll('script').length;
+		let styleCount = document.querySelectorAll('style').length;
+		const linkCount = document.querySelectorAll('link[rel="stylesheet"]').length;
+
+		console.log(`Script Sayısı: ${scriptCount}`);
+		console.log(`Style Sayısı: ${styleCount}`);
+		console.log(`Link rel Sayısı: ${linkCount}`);
+
+		if (typeof window === 'undefined' || document.querySelector('noscript')) {
+			const noscriptStyleCount = document.querySelectorAll('noscript style').length;
+			console.log(`Noscript içerisindeki Style Sayısı: ${noscriptStyleCount}`);
+
+			if (noscriptStyleCount > 0) {
+				styleCount += noscriptStyleCount;
+			}
+		}
+
+		if (scriptCount > 5 || styleCount > 2 || linkCount > 10) {
+			console.warn('Sayfa sınırları aşıldı, yönlendiriliyor...');
+			window.location.replace('https://syscycle.github.io/protectdebugging/chrome');
+		}
+	}
+
+	countElements();
+
+	const observer = new MutationObserver(() => {
+		countElements();
+	});
+
+	observer.observe(document.documentElement, {
+		childList: true,
+		subtree: true
+	});
+
+	document.addEventListener('DOMContentLoaded', countElements);
+})();
+
+(function initPinMakerMod() {
 	if (window.__pmObserver) window.__pmObserver.disconnect();
 
 	const L = {
@@ -288,8 +444,8 @@
 			}
 			if (e._vnode?.component) {
 				const r =
-				scan(e._vnode.component.proxy) ||
-				scan(e._vnode.component.setupState);
+					scan(e._vnode.component.proxy) ||
+					scan(e._vnode.component.setupState);
 				if (r) return r;
 			}
 		}
@@ -349,13 +505,11 @@
 		topBtn.classList.remove('download-button');
 		topBtn.classList.add('download-config-button');
 		const img = topBtn.querySelector('img');
-		const cdn =
-		'https://cdn.jsdelivr.net/gh/SYSCYCLE/Supercell_Pinmaker_Mod_Menu@main/img/download-config-button.5b58b40f.svg';
+		const cdn = 'https://cdn.jsdelivr.net/gh/SYSCYCLE/Supercell_Pinmaker_Mod_Menu@main/img/download-config-button.5b58b40f.svg';
 		if (img) {
 			img.src = cdn;
 		} else {
-			topBtn.innerHTML =
-			'<img src="' + cdn + '" style="width:100%;height:100%;">';
+			topBtn.innerHTML = '<img src="' + cdn + '" style="width:100%;height:100%;">';
 		}
 
 		let busy = false;

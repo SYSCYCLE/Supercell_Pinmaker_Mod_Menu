@@ -85,7 +85,7 @@
 	if (!document.getElementById('pm-marquee-style')) {
 		const st = document.createElement('style');
 		st.id = 'pm-marquee-style';
-		st.textContent = '@keyframes pmMarqueeAnim{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(calc(-100% + 160px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;font-size:18px!important;animation:pmMarqueeAnim 5s ease-in-out infinite alternate!important}';
+		st.textContent = '@keyframes pmMarqueeAnim{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(calc(-100% + 175px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;animation:pmMarqueeAnim 5s ease-in-out infinite alternate!important}';
 		document.head.appendChild(st);
 	}
 
@@ -416,53 +416,54 @@
 		return false;
 	}
 
-	function updateLabel(flbl, text) {
+	function updateLabel(flbl, text, refBtn) {
 		if (!flbl) return;
 		const defaultText = tr('sel');
 		const isFile = !!window.__customPinFileName && text !== defaultText;
 
-		const bg = flbl.closest('.RectangleButton__background');
-		if (bg) {
-			bg.style.overflow = 'hidden';
-			bg.style.padding = '0 10px';
-		}
-
-		const pl = flbl.closest('.pickedLabel');
-		if (pl) {
-			pl.style.width = '160px';
-			pl.style.maxWidth = '160px';
-			pl.style.overflow = 'hidden';
-			pl.style.margin = '0 auto';
-			pl.style.setProperty('--size', '18px');
+		const refLabel = (refBtn || document.querySelector('.upload-modal__button:not(#pm-json-picker-btn)'))?.querySelector('.pickedLabel__label');
+		if (refLabel) {
+			const cs = window.getComputedStyle(refLabel);
+			flbl.style.fontSize = cs.fontSize;
+			flbl.style.fontFamily = cs.fontFamily;
+			flbl.style.fontWeight = cs.fontWeight;
+			flbl.style.textShadow = cs.textShadow;
+			flbl.style.textTransform = cs.textTransform;
 		}
 
 		const pBox = flbl.closest('.pickedLabel__container') || flbl.parentElement;
-		if (pBox) {
-			pBox.style.width = '160px';
-			pBox.style.maxWidth = '160px';
-			pBox.style.minWidth = '0';
-			pBox.style.overflow = 'hidden';
-			pBox.style.display = 'flex';
-			pBox.style.alignItems = 'center';
-			pBox.style.margin = '0 auto';
-		}
+		const bg = flbl.closest('.RectangleButton__background');
 
-		flbl.style.fontSize = '18px';
-		flbl.style.setProperty('font-size', '18px', 'important');
-		flbl.style.lineHeight = '1';
-
-		if (isFile && text.length > 14) {
-			if (pBox) pBox.style.justifyContent = 'flex-start';
+		if (isFile) {
+			if (bg) bg.style.overflow = 'hidden';
+			if (pBox) {
+				pBox.style.width = '180px';
+				pBox.style.maxWidth = '180px';
+				pBox.style.overflow = 'hidden';
+				pBox.style.display = 'flex';
+				pBox.style.justifyContent = 'flex-start';
+				pBox.style.alignItems = 'center';
+				pBox.style.margin = '0 auto';
+			}
 			flbl.style.display = 'inline-block';
 			flbl.style.whiteSpace = 'nowrap';
 			flbl.innerHTML = '<span class="pm-marquee-active">' + text + '</span>';
 		} else {
-			if (pBox) pBox.style.justifyContent = 'center';
-			flbl.style.width = '100%';
+			if (bg) bg.style.overflow = '';
+			if (pBox) {
+				pBox.style.width = '';
+				pBox.style.maxWidth = '';
+				pBox.style.overflow = '';
+				pBox.style.display = '';
+				pBox.style.justifyContent = '';
+				pBox.style.alignItems = '';
+				pBox.style.margin = '';
+			}
+			flbl.style.display = '';
+			flbl.style.whiteSpace = '';
 			flbl.style.textAlign = 'center';
-			flbl.style.display = 'block';
-			flbl.style.whiteSpace = 'nowrap';
-			flbl.textContent = text;
+			flbl.innerHTML = '';
+			flbl.textContent = defaultText;
 		}
 	}
 
@@ -559,7 +560,7 @@
 				myPickerBtn.id = 'pm-json-picker-btn';
 				myPickerBtn.style.marginTop = '14px';
 				const flbl = myPickerBtn.querySelector('.pickedLabel__label');
-				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName) : tr('sel'));
+				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName) : tr('sel'), mySaveBtn);
 
 				myPickerBtn.onclick = function (e) {
 					e.preventDefault();
@@ -578,7 +579,7 @@
 					if (!f) {
 						window.__customPinPayload = null;
 						window.__customPinFileName = null;
-						updateLabel(flbl, tr('sel'));
+						updateLabel(flbl, tr('sel'), mySaveBtn);
 						return;
 					}
 
@@ -586,7 +587,7 @@
 						alert(tr('inv'));
 						window.__customPinPayload = null;
 						window.__customPinFileName = null;
-						updateLabel(flbl, tr('sel'));
+						updateLabel(flbl, tr('sel'), mySaveBtn);
 						return;
 					}
 
@@ -601,12 +602,12 @@
 							alert(tr('inv'));
 							window.__customPinPayload = null;
 							window.__customPinFileName = null;
-							updateLabel(flbl, tr('sel'));
+							updateLabel(flbl, tr('sel'), mySaveBtn);
 							return;
 						}
 						window.__customPinPayload = parsedData;
 						window.__customPinFileName = f.name;
-						updateLabel(flbl, '✓ ' + f.name);
+						updateLabel(flbl, '✓ ' + f.name, mySaveBtn);
 					};
 					r.readAsArrayBuffer(f);
 				};
@@ -614,7 +615,7 @@
 				fileInput.oncancel = function () {
 					window.__customPinPayload = null;
 					window.__customPinFileName = null;
-					updateLabel(flbl, tr('sel'));
+					updateLabel(flbl, tr('sel'), mySaveBtn);
 				};
 
 				mySaveBtn.parentNode.insertBefore(myPickerBtn, mySaveBtn.nextSibling);

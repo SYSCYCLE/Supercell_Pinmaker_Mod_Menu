@@ -85,7 +85,7 @@
 	if (!document.getElementById('pm-marquee-style')) {
 		const st = document.createElement('style');
 		st.id = 'pm-marquee-style';
-		st.textContent = '@keyframes pmMarqueeLoop{0%{transform:translateX(0%)}100%{transform:translateX(-50%)}}.pm-marquee-track{display:inline-flex!important;white-space:nowrap!important;will-change:transform!important;animation:pmMarqueeLoop 8s linear infinite!important}';
+		st.textContent = '@keyframes pmTickerLoop{0%{transform:translateX(0%)}100%{transform:translateX(-50%)}}.pm-ticker-track{display:inline-flex!important;white-space:nowrap!important;will-change:transform!important;animation:pmTickerLoop 7s linear infinite!important}.pm-ticker-track span{white-space:nowrap!important;display:inline-block!important}';
 		document.head.appendChild(st);
 	}
 
@@ -424,7 +424,6 @@
 		const refLabel = (refBtn || document.querySelector('.upload-modal__button:not(#pm-json-picker-btn)'))?.querySelector('.pickedLabel__label');
 		if (refLabel) {
 			const cs = window.getComputedStyle(refLabel);
-			flbl.style.fontSize = cs.fontSize;
 			flbl.style.fontFamily = cs.fontFamily;
 			flbl.style.fontWeight = cs.fontWeight;
 			flbl.style.textShadow = cs.textShadow;
@@ -447,8 +446,9 @@
 			}
 			flbl.style.display = 'inline-block';
 			flbl.style.whiteSpace = 'nowrap';
+			flbl.style.fontSize = '';
 			const spacer = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
-			flbl.innerHTML = '<span class="pm-marquee-track"><span>' + text + spacer + '</span><span>' + text + spacer + '</span></span>';
+			flbl.innerHTML = '<span class="pm-ticker-track"><span>' + text + spacer + '</span><span>' + text + spacer + '</span></span>';
 		} else {
 			if (bg) bg.style.overflow = '';
 			if (pBox) {
@@ -462,6 +462,7 @@
 			}
 			flbl.style.display = '';
 			flbl.style.whiteSpace = '';
+			flbl.style.fontSize = '';
 			flbl.style.textAlign = 'center';
 			flbl.innerHTML = '';
 			flbl.textContent = defaultText;

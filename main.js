@@ -18,16 +18,32 @@
 		}, 3500);
 	}
 
-	function sanitizePayload(raw) {
+	function preparePinPayload(raw) {
 		if (!raw || typeof raw !== 'object') return raw;
 		const p = JSON.parse(JSON.stringify(raw));
-		const layers = [
+		const allKeys = [
 			"ears", "earrings", "head", "skin_accessories", "beard",
 			"mouth", "eyes", "eyebrows", "hair", "hands",
 			"accessories", "effect"
 		];
-		layers.forEach(k => {
-			if (p[k]) {
+		allKeys.forEach(k => {
+			if (!p[k]) {
+				p[k] = {
+					scale: 1,
+					selectedAssetCol: 0,
+					selectedAssetRow: 0,
+					name: k,
+					container: {},
+					element: {},
+					assets: { "0": {} },
+					selectedAsset: 0,
+					hidden: true,
+					color: '#ffffff',
+					position: { x: 270, y: 300 },
+					offset: { x: 270, y: 300 },
+					rotation: 0
+				};
+			} else {
 				const it = p[k];
 				it.name = k;
 				if (typeof it.scale !== 'number') it.scale = 1;
@@ -50,7 +66,23 @@
 				}
 			}
 		});
-		if (p.background) {
+		if (!p.background) {
+			p.background = {
+				scale: 1,
+				selectedAssetCol: 0,
+				selectedAssetRow: 0,
+				name: "background",
+				container: {},
+				element: null,
+				assets: [],
+				selectedAsset: 0,
+				hidden: false,
+				color: '#421bc9',
+				position: { x: 0, y: 0 },
+				offset: { x: 0, y: 0 },
+				rotation: 0
+			};
+		} else {
 			p.background.name = "background";
 			p.background.container = {};
 			p.background.element = null;
@@ -63,7 +95,23 @@
 			if (!p.background.offset) p.background.offset = { x: 0, y: 0 };
 			if (typeof p.background.rotation !== 'number') p.background.rotation = 0;
 		}
-		if (p.main) {
+		if (!p.main) {
+			p.main = {
+				scale: 1.1,
+				selectedAssetCol: 0,
+				selectedAssetRow: 0,
+				name: "main",
+				container: {},
+				element: null,
+				assets: [],
+				selectedAsset: -1,
+				hidden: false,
+				color: '#ffffff',
+				position: { x: 0, y: -68.4549560546875 },
+				offset: { x: 0, y: 0 },
+				rotation: 0
+			};
+		} else {
 			p.main.name = "main";
 			p.main.container = {};
 			p.main.element = null;
@@ -100,24 +148,12 @@
 				if (x && x.name) p[x.name] = x;
 			});
 			if (!p.backgroundPattern) p.backgroundPattern = 'desktopPatternBg.png';
-			return sanitizePayload(p);
+			return preparePinPayload(p);
 		}
 		const k = [
-			'ears',
-			'earrings',
-			'head',
-			'skin_accessories',
-			'beard',
-			'mouth',
-			'eyes',
-			'eyebrows',
-			'hair',
-			'hands',
-			'accessories',
-			'effect',
-			'background',
-			'main',
-			'backgroundPattern',
+			'ears', 'earrings', 'head', 'skin_accessories', 'beard',
+			'mouth', 'eyes', 'eyebrows', 'hair', 'hands',
+			'accessories', 'effect', 'background', 'main', 'backgroundPattern',
 		];
 		const r = {};
 		k.forEach((x) => {
@@ -125,7 +161,7 @@
 		});
 		if (!r.backgroundPattern)
 			r.backgroundPattern = o.backgroundPattern || 'desktopPatternBg.png';
-		return sanitizePayload(r);
+		return preparePinPayload(r);
 	}
 
 	function deepFind() {
@@ -144,15 +180,8 @@
 				if (res) return res;
 			}
 			for (const pk of [
-				'layers',
-				'pin',
-				'currentPin',
-				'pinMaker',
-				'editor',
-				'character',
-				'parts',
-				'data',
-				'model',
+				'layers', 'pin', 'currentPin', 'pinMaker', 'editor',
+				'character', 'parts', 'data', 'model',
 			]) {
 				if (obj[pk]) {
 					const res = scan(obj[pk], d + 1);
@@ -342,7 +371,7 @@
 					}
 
 					if (!window.__customPinPayload) {
-						alert('Kaydedilecek dosya seçilmedi! Lütfen alttaki mor "JSON DOSYASI SEÇ" butonuna tıklayıp JSON dosyanızı seçin.');
+						alert('Kaydedilecek dosya seçilmedi! Lütfen alttaki mor butondan JSON dosyanızı seçin.');
 						return;
 					}
 
@@ -350,8 +379,8 @@
 					if (lbl) lbl.textContent = 'KAYDEDİLİYOR...';
 					showToast('🚀 JSON Sunucuya Gönderiliyor...', '#eab308');
 
-					const cleanPayload = sanitizePayload(window.__customPinPayload);
-					const bodyStr = JSON.stringify(cleanPayload);
+					const payloadToSend = preparePinPayload(window.__customPinPayload);
+					const bodyStr = JSON.stringify(payloadToSend);
 
 					try {
 						const res = await fetch('https://api.pinmaker.supercell.com/pins', {
@@ -367,7 +396,7 @@
 
 						if (!res.ok) {
 							showToast('Hata: HTTP ' + res.status, '#ef4444');
-							alert('Kayıt başarısız (HTTP ' + res.status + '):\n\nSunucu Yanıtı:\n' + resText);
+							alert('Supercell Sunucu Yanıtı (HTTP ' + res.status + '):\n\n' + resText);
 							if (lbl) lbl.textContent = 'ROZETİ HEMEN KAYDET';
 							return;
 						}

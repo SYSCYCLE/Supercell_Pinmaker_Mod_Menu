@@ -1,48 +1,6 @@
 (function () {
 	if (window.__pmObserver) window.__pmObserver.disconnect();
 
-	if (!window.__pmFetchHooked) {
-		window.__pmFetchHooked = true;
-		const origFetch = window.fetch;
-		window.fetch = function (resource, init) {
-			try {
-				let u = typeof resource === 'string' ? resource : resource?.url || '';
-				let m = (init?.method || (resource instanceof Request ? resource.method : 'GET')).toUpperCase();
-				if (u.includes('/pins') && m === 'POST' && window.__customPinPayload) {
-					const b = typeof window.__customPinPayload === 'string' ? window.__customPinPayload : JSON.stringify(window.__customPinPayload);
-					if (resource instanceof Request) {
-						resource = new Request(resource, { body: b });
-					} else {
-						init = init || {};
-						init.body = b;
-					}
-					showToast('🚀 Özel JSON Gönderiliyor...', '#22c55e');
-				}
-			} catch (e) {}
-			return origFetch.call(this, resource, init);
-		};
-	}
-
-	if (!window.__pmXhrHooked) {
-		window.__pmXhrHooked = true;
-		const origOpen = XMLHttpRequest.prototype.open;
-		const origSend = XMLHttpRequest.prototype.send;
-		XMLHttpRequest.prototype.open = function (method, url) {
-			this._url = url;
-			this._method = method;
-			return origOpen.apply(this, arguments);
-		};
-		XMLHttpRequest.prototype.send = function (body) {
-			try {
-				if (this._url && String(this._url).includes('/pins') && String(this._method).toUpperCase() === 'POST' && window.__customPinPayload) {
-					body = typeof window.__customPinPayload === 'string' ? window.__customPinPayload : JSON.stringify(window.__customPinPayload);
-					showToast('🚀 Özel JSON Gönderiliyor...', '#22c55e');
-				}
-			} catch (e) {}
-			return origSend.apply(this, arguments);
-		};
-	}
-
 	function showToast(msg, color = '#6366f1') {
 		let t = document.getElementById('pm-toast');
 		if (!t) {
@@ -302,64 +260,68 @@
 		}
 
 		const upBtn = document.querySelector('.upload-modal__button');
-		const existingFileBtn = document.getElementById('pm-json-picker-btn');
-
 		if (upBtn && upBtn.isConnected) {
-			if (!upBtn.__pmBound) {
-				upBtn.__pmBound = true;
-				upBtn.addEventListener('click', function (e) {
-					if (window.__customPinPayload) {
-						e.preventDefault();
-						e.stopPropagation();
-						e.stopImmediatePropagation();
+			let currentSaveBtn = upBtn;
+			if (upBtn.getAttribute('data-pm-hijacked') !== 'true') {
+				const hijackedBtn = upBtn.cloneNode(true);
+				hijackedBtn.setAttribute('data-pm-hijacked', 'true');
+				hijackedBtn.onclick = function (e) {
+					e.preventDefault();
+					e.stopPropagation();
 
-						const saveLabel = upBtn.querySelector('.pickedLabel__label');
-						const originalText = saveLabel ? saveLabel.textContent : '';
-						if (saveLabel) saveLabel.textContent = 'KAYDEDİLİYOR...';
-						showToast('⏳ Özel JSON kaydediliyor...', '#eab308');
-
-						const payloadStr = typeof window.__customPinPayload === 'string'
-							? window.__customPinPayload
-							: JSON.stringify(window.__customPinPayload);
-
-						fetch('https://api.pinmaker.supercell.com/pins', {
-							method: 'POST',
-							credentials: 'include',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							body: payloadStr
-						})
-						.then((res) => {
-							if (!res.ok) throw new Error('HTTP ' + res.status);
-							return res.text();
-						})
-						.then(() => {
-							showToast('✓ Özel Rozet Başarıyla Kaydedildi!', '#22c55e');
-							if (saveLabel) saveLabel.textContent = '✓ KAYDEDİLDİ!';
-							setTimeout(() => {
-								location.reload();
-							}, 1200);
-						})
-						.catch((err) => {
-							showToast('Hata: ' + err.message, '#ef4444');
-							alert('Rozet kaydedilirken hata oluştu: ' + err.message);
-							if (saveLabel) saveLabel.textContent = originalText;
-						});
+					const payload = window.__customPinPayload || deepFind();
+					if (!payload) {
+						alert('Kaydedilecek veri bulunamadı! Lütfen önce JSON DOSYASI SEÇ butonundan bir dosya seçin.');
+						return;
 					}
-				}, true);
+
+					const lbl = hijackedBtn.querySelector('.pickedLabel__label');
+					const origTxt = lbl ? lbl.textContent : '';
+					if (lbl) lbl.textContent = 'KAYDEDİLİYOR...';
+					showToast('🚀 Doğrudan sunucuya iletiliyor...', '#eab308');
+
+					const bodyStr = typeof payload === 'string' ? payload : JSON.stringify(payload);
+
+					fetch('https://api.pinmaker.supercell.com/pins', {
+						method: 'POST',
+						credentials: 'include',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: bodyStr
+					})
+					.then((res) => {
+						if (!res.ok) throw new Error('HTTP ' + res.status);
+						return res.text();
+					})
+					.then((data) => {
+						showToast('✓ Rozet Başarıyla Kaydedildi!', '#22c55e');
+						if (lbl) lbl.textContent = '✓ KAYDEDİLDİ!';
+						setTimeout(() => {
+							location.reload();
+						}, 1200);
+					})
+					.catch((err) => {
+						showToast('Hata: ' + err.message, '#ef4444');
+						alert('Kayıt başarısız: ' + err.message);
+						if (lbl) lbl.textContent = origTxt;
+					});
+				};
+
+				upBtn.parentNode.replaceChild(hijackedBtn, upBtn);
+				currentSaveBtn = hijackedBtn;
 			}
 
+			const existingFileBtn = document.getElementById('pm-json-picker-btn');
 			if (!existingFileBtn) {
-				const fb = upBtn.cloneNode(true);
+				const fb = currentSaveBtn.cloneNode(true);
 				fb.id = 'pm-json-picker-btn';
+				fb.setAttribute('data-pm-hijacked', 'picker');
 				fb.style.marginTop = '14px';
-				fb.querySelector('.RectangleButton--blue')?.classList.remove(
-					'RectangleButton--blue'
-				);
-				const lbl = fb.querySelector('.pickedLabel__label');
-				if (lbl)
-					lbl.textContent = window.__customPinFileName
+				fb.querySelector('.RectangleButton--blue')?.classList.remove('RectangleButton--blue');
+				const flbl = fb.querySelector('.pickedLabel__label');
+				if (flbl)
+					flbl.textContent = window.__customPinFileName
 						? '✓ ' + window.__customPinFileName
 						: 'JSON DOSYASI SEÇ';
 
@@ -378,8 +340,8 @@
 							const j = JSON.parse(eRes.target.result);
 							window.__customPinPayload = j;
 							window.__customPinFileName = f.name;
-							if (lbl) lbl.textContent = '✓ ' + f.name;
-							showToast('✓ JSON Seçildi: ' + f.name, '#22c55e');
+							if (flbl) flbl.textContent = '✓ ' + f.name;
+							showToast('✓ JSON Hazır! Rozeti Hemen Kaydet\'e basın.', '#22c55e');
 						} catch (err) {
 							alert('Hata: Geçersiz JSON dosyası!');
 						}
@@ -387,9 +349,10 @@
 					r.readAsText(f);
 				};
 
-				upBtn.parentNode.insertBefore(fb, upBtn.nextSibling);
+				currentSaveBtn.parentNode.insertBefore(fb, currentSaveBtn.nextSibling);
 			}
 		} else {
+			const existingFileBtn = document.getElementById('pm-json-picker-btn');
 			if (existingFileBtn) existingFileBtn.remove();
 		}
 	}

@@ -18,6 +18,68 @@
 		}, 3500);
 	}
 
+	function sanitizePayload(raw) {
+		if (!raw || typeof raw !== 'object') return raw;
+		const p = JSON.parse(JSON.stringify(raw));
+		const layers = [
+			"ears", "earrings", "head", "skin_accessories", "beard",
+			"mouth", "eyes", "eyebrows", "hair", "hands",
+			"accessories", "effect"
+		];
+		layers.forEach(k => {
+			if (p[k]) {
+				const it = p[k];
+				it.name = k;
+				if (typeof it.scale !== 'number') it.scale = 1;
+				if (typeof it.selectedAssetCol !== 'number') it.selectedAssetCol = 0;
+				if (typeof it.selectedAssetRow !== 'number') it.selectedAssetRow = 0;
+				if (typeof it.selectedAsset !== 'number') it.selectedAsset = 0;
+				if (typeof it.hidden !== 'boolean') it.hidden = false;
+				if (typeof it.color !== 'string') it.color = '#ffffff';
+				if (!it.position || typeof it.position.x !== 'number') it.position = { x: 270, y: 300 };
+				if (!it.offset || typeof it.offset.x !== 'number') it.offset = { x: it.position.x, y: it.position.y };
+				if (typeof it.rotation !== 'number') it.rotation = 0;
+				if (!it.container || typeof it.container !== 'object') it.container = {};
+				if (!it.element || typeof it.element !== 'object') it.element = {};
+				if (!it.assets || typeof it.assets !== 'object') {
+					it.assets = { "0": {} };
+				} else if (Array.isArray(it.assets)) {
+					const asObj = {};
+					it.assets.forEach((_, idx) => { asObj[idx] = {}; });
+					it.assets = asObj;
+				}
+			}
+		});
+		if (p.background) {
+			p.background.name = "background";
+			p.background.container = {};
+			p.background.element = null;
+			if (!Array.isArray(p.background.assets)) p.background.assets = [];
+			if (typeof p.background.scale !== 'number') p.background.scale = 1;
+			if (typeof p.background.selectedAsset !== 'number') p.background.selectedAsset = 0;
+			if (typeof p.background.hidden !== 'boolean') p.background.hidden = false;
+			if (typeof p.background.color !== 'string') p.background.color = '#421bc9';
+			if (!p.background.position) p.background.position = { x: 0, y: 0 };
+			if (!p.background.offset) p.background.offset = { x: 0, y: 0 };
+			if (typeof p.background.rotation !== 'number') p.background.rotation = 0;
+		}
+		if (p.main) {
+			p.main.name = "main";
+			p.main.container = {};
+			p.main.element = null;
+			if (!Array.isArray(p.main.assets)) p.main.assets = [];
+			if (typeof p.main.scale !== 'number') p.main.scale = 1.1;
+			if (typeof p.main.selectedAsset !== 'number') p.main.selectedAsset = -1;
+			if (typeof p.main.hidden !== 'boolean') p.main.hidden = false;
+			if (typeof p.main.color !== 'string') p.main.color = '#ffffff';
+			if (!p.main.position) p.main.position = { x: 0, y: -68.4549560546875 };
+			if (!p.main.offset) p.main.offset = { x: 0, y: 0 };
+			if (typeof p.main.rotation !== 'number') p.main.rotation = 0;
+		}
+		if (!p.backgroundPattern) p.backgroundPattern = "desktopPatternBg.png";
+		return p;
+	}
+
 	function isPinObj(o) {
 		if (!o || typeof o !== 'object') return false;
 		if (o.head && (o.ears || o.mouth || o.eyes) && typeof o.head === 'object')
@@ -38,7 +100,7 @@
 				if (x && x.name) p[x.name] = x;
 			});
 			if (!p.backgroundPattern) p.backgroundPattern = 'desktopPatternBg.png';
-			return p;
+			return sanitizePayload(p);
 		}
 		const k = [
 			'ears',
@@ -63,7 +125,7 @@
 		});
 		if (!r.backgroundPattern)
 			r.backgroundPattern = o.backgroundPattern || 'desktopPatternBg.png';
-		return r;
+		return sanitizePayload(r);
 	}
 
 	function deepFind() {
@@ -273,7 +335,7 @@
 				mySaveBtn.id = 'pm-my-save-btn';
 				mySaveBtn.style.display = 'flex';
 
-				function doDirectSave(e) {
+				async function doDirectSave(e) {
 					if (e) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -286,36 +348,40 @@
 
 					const lbl = mySaveBtn.querySelector('.pickedLabel__label');
 					if (lbl) lbl.textContent = 'KAYDEDİLİYOR...';
-					showToast('🚀 Seçilen JSON Doğrudan Gönderiliyor...', '#eab308');
+					showToast('🚀 JSON Sunucuya Gönderiliyor...', '#eab308');
 
-					const bodyStr = typeof window.__customPinPayload === 'string'
-						? window.__customPinPayload
-						: JSON.stringify(window.__customPinPayload);
+					const cleanPayload = sanitizePayload(window.__customPinPayload);
+					const bodyStr = JSON.stringify(cleanPayload);
 
-					fetch('https://api.pinmaker.supercell.com/pins', {
-						method: 'POST',
-						credentials: 'include',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: bodyStr
-					})
-					.then((res) => {
-						if (!res.ok) throw new Error('HTTP ' + res.status);
-						return res.text();
-					})
-					.then((data) => {
+					try {
+						const res = await fetch('https://api.pinmaker.supercell.com/pins', {
+							method: 'POST',
+							credentials: 'include',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: bodyStr
+						});
+
+						const resText = await res.text();
+
+						if (!res.ok) {
+							showToast('Hata: HTTP ' + res.status, '#ef4444');
+							alert('Kayıt başarısız (HTTP ' + res.status + '):\n\nSunucu Yanıtı:\n' + resText);
+							if (lbl) lbl.textContent = 'ROZETİ HEMEN KAYDET';
+							return;
+						}
+
 						showToast('✓ Seçilen JSON Başarıyla Kaydedildi!', '#22c55e');
 						if (lbl) lbl.textContent = '✓ KAYDEDİLDİ!';
 						setTimeout(() => {
 							location.reload();
 						}, 1200);
-					})
-					.catch((err) => {
-						showToast('Hata: ' + err.message, '#ef4444');
-						alert('Kayıt başarısız: ' + err.message);
+					} catch (err) {
+						showToast('Bağlantı Hatası: ' + err.message, '#ef4444');
+						alert('İstek gönderilemedi: ' + err.message);
 						if (lbl) lbl.textContent = 'ROZETİ HEMEN KAYDET';
-					});
+					}
 				}
 
 				mySaveBtn.onclick = doDirectSave;

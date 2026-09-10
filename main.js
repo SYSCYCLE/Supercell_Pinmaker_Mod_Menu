@@ -8,7 +8,7 @@
 		de: { sel: "SPCFG-DATEI WÄHLEN", sav: "SPEICHERN...", ok: "✓ GESPEICHERT!", cd: "Tägliches Limit erreicht. Bitte warten.", nd: "Keine Daten gefunden!", inv: "Fehler: Ungültige SPCFG-Datei!", err: "Supercell-Serverantwort" },
 		fr: { sel: "CHOISIR FICHIER SPCFG", sav: "ENREGISTREMENT...", ok: "✓ ENREGISTRÉ !", cd: "Limite quotidienne atteinte. Veuillez patienter.", nd: "Aucune donnée trouvée !", inv: "Erreur : Fichier SPCFG invalide !", err: "Réponse du serveur Supercell" },
 		it: { sel: "SCEGLI FILE SPCFG", sav: "SALVATAGGIO...", ok: "✓ SALVATO!", cd: "Limite giornaliero raggiunto. Attendi.", nd: "Nessun dato trovato!", inv: "Errore: File SPCFG non valido!", err: "Risposta server Supercell" },
-		pt: { sel: "ESCOLHER ARQUIVO SPCFG", sav: "SALVANDO...", ok: "✓ SALVO!", cd: "Limite diário atingido. Por favor aguarde.", nd: "Nenhum dado encontrado!", inv: "Erro: Arquivo SPCFG inválido!", err: "Resposta do servidor Supercell" },
+		pt: { sel: "ESCOLHER ARQUIVO SPCFG", sav: "SALVANDO...", ok: "✓ SALVO!", cd: "Limite diário atingido. Por favor aguarde.", nd: "Nenhum dato encontrado!", inv: "Erro: Arquivo SPCFG inválido!", err: "Resposta do servidor Supercell" },
 		ru: { sel: "ВЫБРАТЬ ФАЙЛ SPCFG", sav: "СОХРАНЕНИЕ...", ok: "✓ СОХРАНЕНО!", cd: "Дневной лимит исчерпан. Пожалуйста, подождите.", nd: "Данные пина не найдены!", inv: "Ошибка: Неверный файл SPCFG!", err: "Ответ сервера Supercell" },
 		pl: { sel: "WYBIERZ PLIK SPCFG", sav: "ZAPISYWANIE...", ok: "✓ ZAPISANO!", cd: "Osiągnięto dzienny limit. Proszę czekać.", nd: "Nie znaleziono danych!", inv: "Błąd: Nieprawidłowy plik SPCFG!", err: "Odpowiedź serwera Supercell" },
 		jp: { sel: "SPCFGファイルを選択", sav: "保存中...", ok: "✓ 保存完了！", cd: "1日の保存制限に達しました。お待ちください。", nd: "データが見つかりません！", inv: "エラー: 無効なSPCFGファイルです！", err: "Supercellサーバーの応答" },
@@ -365,7 +365,7 @@
 				const str = JSON.stringify(data);
 				const encryptedBase64 = await encryptData(str);
 				const blob = new Blob([encryptedBase64], {
-					type: 'text/plain;charset=utf-8'
+					type: 'application/octet-stream'
 				});
 				const url = URL.createObjectURL(blob);
 				const a = document.createElement('a');
@@ -388,7 +388,7 @@
 		fileInput = document.createElement('input');
 		fileInput.id = 'pm-hidden-file-input';
 		fileInput.type = 'file';
-		fileInput.accept = '.spcfg,.json';
+		fileInput.accept = '.spcfg,.json,.txt';
 		fileInput.style.display = 'none';
 		document.body.appendChild(fileInput);
 	}
@@ -522,7 +522,8 @@
 				myPickerBtn.id = 'pm-json-picker-btn';
 				myPickerBtn.style.marginTop = '14px';
 				const flbl = myPickerBtn.querySelector('.pickedLabel__label');
-				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName) : tr('sel'));
+				const currentDisplayName = window.__customPinFileName ? ('✓ ' + window.__customPinFileName.replace(/\.txt$/i, '')) : tr('sel');
+				updateLabel(flbl, currentDisplayName);
 
 				myPickerBtn.onclick = function (e) {
 					e.preventDefault();
@@ -563,8 +564,8 @@
 							}
 						}
 						window.__customPinPayload = parsedData;
-						window.__customPinFileName = f.name;
-						updateLabel(flbl, '✓ ' + f.name);
+						window.__customPinFileName = f.name.replace(/\.txt$/i, '');
+						updateLabel(flbl, '✓ ' + window.__customPinFileName);
 					};
 					r.readAsText(f);
 				};

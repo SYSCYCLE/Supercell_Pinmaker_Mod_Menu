@@ -85,7 +85,7 @@
 	if (!document.getElementById('pm-marquee-style')) {
 		const st = document.createElement('style');
 		st.id = 'pm-marquee-style';
-		st.textContent = '@keyframes pmMarqueeAnim{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(calc(-100% + 175px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;animation:pmMarqueeAnim 5s ease-in-out infinite alternate!important}';
+		st.textContent = '@keyframes pmMarqueeLoop{0%{transform:translateX(0%)}100%{transform:translateX(-50%)}}.pm-marquee-track{display:inline-flex!important;white-space:nowrap!important;will-change:transform!important;animation:pmMarqueeLoop 8s linear infinite!important}';
 		document.head.appendChild(st);
 	}
 
@@ -447,7 +447,8 @@
 			}
 			flbl.style.display = 'inline-block';
 			flbl.style.whiteSpace = 'nowrap';
-			flbl.innerHTML = '<span class="pm-marquee-active">' + text + '</span>';
+			const spacer = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
+			flbl.innerHTML = '<span class="pm-marquee-track"><span>' + text + spacer + '</span><span>' + text + spacer + '</span></span>';
 		} else {
 			if (bg) bg.style.overflow = '';
 			if (pBox) {

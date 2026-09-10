@@ -246,60 +246,6 @@
 		document.body.appendChild(fileInput);
 	}
 
-	if (!window.__pmCaptureBound) {
-		window.__pmCaptureBound = true;
-		document.addEventListener('click', function (e) {
-			const clickedPicker = e.target.closest('#pm-json-picker-btn');
-			if (clickedPicker) return;
-
-			const saveBtn = e.target.closest('.upload-modal__button');
-			if (saveBtn) {
-				e.preventDefault();
-				e.stopPropagation();
-				e.stopImmediatePropagation();
-
-				if (!window.__customPinPayload) {
-					alert('Kaydedilecek özel JSON seçilmedi! Lütfen alttaki "JSON DOSYASI SEÇ" butonuna tıklayıp dosyanızı seçin.');
-					return;
-				}
-
-				const lbl = saveBtn.querySelector('.pickedLabel__label');
-				const origTxt = lbl ? lbl.textContent : '';
-				if (lbl) lbl.textContent = 'KAYDEDİLİYOR...';
-				showToast('🚀 Özel JSON Doğrudan Gönderiliyor...', '#eab308');
-
-				const bodyStr = typeof window.__customPinPayload === 'string'
-					? window.__customPinPayload
-					: JSON.stringify(window.__customPinPayload);
-
-				fetch('https://api.pinmaker.supercell.com/pins', {
-					method: 'POST',
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: bodyStr
-				})
-				.then((res) => {
-					if (!res.ok) throw new Error('HTTP ' + res.status);
-					return res.text();
-				})
-				.then((data) => {
-					showToast('✓ Seçilen JSON Başarıyla Kaydedildi!', '#22c55e');
-					if (lbl) lbl.textContent = '✓ KAYDEDİLDİ!';
-					setTimeout(() => {
-						location.reload();
-					}, 1200);
-				})
-				.catch((err) => {
-					showToast('Hata: ' + err.message, '#ef4444');
-					alert('Kayıt başarısız oldu: ' + err.message);
-					if (lbl) lbl.textContent = origTxt;
-				});
-			}
-		}, true);
-	}
-
 	function sync() {
 		const dl = getDl();
 		if (topBtn) {
@@ -313,21 +259,82 @@
 			}
 		}
 
-		const upBtn = document.querySelector('.upload-modal__button');
-		if (upBtn && upBtn.isConnected) {
-			const existingFileBtn = document.getElementById('pm-json-picker-btn');
-			if (!existingFileBtn) {
-				const fb = upBtn.cloneNode(true);
-				fb.id = 'pm-json-picker-btn';
-				fb.style.marginTop = '14px';
-				fb.querySelector('.RectangleButton--blue')?.classList.remove('RectangleButton--blue');
-				const flbl = fb.querySelector('.pickedLabel__label');
+		const realBtns = Array.from(document.querySelectorAll('.upload-modal__button')).filter(
+			el => el.id !== 'pm-my-save-btn' && el.id !== 'pm-json-picker-btn'
+		);
+
+		if (realBtns.length > 0 && realBtns[0].isConnected) {
+			const realSaveBtn = realBtns[0];
+			realSaveBtn.style.display = 'none';
+
+			let mySaveBtn = document.getElementById('pm-my-save-btn');
+			if (!mySaveBtn) {
+				mySaveBtn = realSaveBtn.cloneNode(true);
+				mySaveBtn.id = 'pm-my-save-btn';
+				mySaveBtn.style.display = 'flex';
+
+				function doDirectSave(e) {
+					if (e) {
+						e.preventDefault();
+						e.stopPropagation();
+					}
+
+					if (!window.__customPinPayload) {
+						alert('Kaydedilecek dosya seçilmedi! Lütfen alttaki mor "JSON DOSYASI SEÇ" butonuna tıklayıp JSON dosyanızı seçin.');
+						return;
+					}
+
+					const lbl = mySaveBtn.querySelector('.pickedLabel__label');
+					if (lbl) lbl.textContent = 'KAYDEDİLİYOR...';
+					showToast('🚀 Seçilen JSON Doğrudan Gönderiliyor...', '#eab308');
+
+					const bodyStr = typeof window.__customPinPayload === 'string'
+						? window.__customPinPayload
+						: JSON.stringify(window.__customPinPayload);
+
+					fetch('https://api.pinmaker.supercell.com/pins', {
+						method: 'POST',
+						credentials: 'include',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: bodyStr
+					})
+					.then((res) => {
+						if (!res.ok) throw new Error('HTTP ' + res.status);
+						return res.text();
+					})
+					.then((data) => {
+						showToast('✓ Seçilen JSON Başarıyla Kaydedildi!', '#22c55e');
+						if (lbl) lbl.textContent = '✓ KAYDEDİLDİ!';
+						setTimeout(() => {
+							location.reload();
+						}, 1200);
+					})
+					.catch((err) => {
+						showToast('Hata: ' + err.message, '#ef4444');
+						alert('Kayıt başarısız: ' + err.message);
+						if (lbl) lbl.textContent = 'ROZETİ HEMEN KAYDET';
+					});
+				}
+
+				mySaveBtn.onclick = doDirectSave;
+				realSaveBtn.parentNode.insertBefore(mySaveBtn, realSaveBtn.nextSibling);
+			}
+
+			let myPickerBtn = document.getElementById('pm-json-picker-btn');
+			if (!myPickerBtn && mySaveBtn) {
+				myPickerBtn = mySaveBtn.cloneNode(true);
+				myPickerBtn.id = 'pm-json-picker-btn';
+				myPickerBtn.style.marginTop = '14px';
+				myPickerBtn.querySelector('.RectangleButton--blue')?.classList.remove('RectangleButton--blue');
+				const flbl = myPickerBtn.querySelector('.pickedLabel__label');
 				if (flbl)
 					flbl.textContent = window.__customPinFileName
 						? '✓ ' + window.__customPinFileName
 						: 'JSON DOSYASI SEÇ';
 
-				fb.onclick = function (e) {
+				myPickerBtn.onclick = function (e) {
 					e.preventDefault();
 					e.stopPropagation();
 					fileInput.click();
@@ -343,7 +350,7 @@
 							window.__customPinPayload = j;
 							window.__customPinFileName = f.name;
 							if (flbl) flbl.textContent = '✓ ' + f.name;
-							showToast('✓ JSON Hazır! Üstteki butona basarak kaydedin.', '#22c55e');
+							showToast('✓ JSON Hazır! Şimdi mavi butona bas.', '#22c55e');
 						} catch (err) {
 							alert('Hata: Geçersiz JSON dosyası!');
 						}
@@ -351,11 +358,13 @@
 					r.readAsText(f);
 				};
 
-				upBtn.parentNode.insertBefore(fb, upBtn.nextSibling);
+				mySaveBtn.parentNode.insertBefore(myPickerBtn, mySaveBtn.nextSibling);
 			}
 		} else {
-			const existingFileBtn = document.getElementById('pm-json-picker-btn');
-			if (existingFileBtn) existingFileBtn.remove();
+			const b1 = document.getElementById('pm-my-save-btn');
+			const b2 = document.getElementById('pm-json-picker-btn');
+			if (b1) b1.remove();
+			if (b2) b2.remove();
 		}
 	}
 

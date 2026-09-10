@@ -1,21 +1,11 @@
 (function () {
 	if (window.__pmObserver) window.__pmObserver.disconnect();
 
-	function showToast(msg, color = '#6366f1') {
-		let t = document.getElementById('pm-toast');
-		if (!t) {
-			t = document.createElement('div');
-			t.id = 'pm-toast';
-			t.style.cssText =
-			'position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#18181b;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999999;box-shadow:0 6px 20px rgba(0,0,0,0.5);border:1.5px solid #3f3f46;transition:all .3s;text-align:center;pointer-events:none;font-family:sans-serif;';
-			document.body.appendChild(t);
-		}
-		t.textContent = msg;
-		t.style.borderColor = color;
-		t.style.opacity = '1';
-		setTimeout(() => {
-			if (t) t.style.opacity = '0';
-		}, 3500);
+	if (!document.getElementById('pm-marquee-style')) {
+		const st = document.createElement('style');
+		st.id = 'pm-marquee-style';
+		st.textContent = '@keyframes pmMarqueeAnim{0%,20%{transform:translateX(0%)}80%,100%{transform:translateX(calc(-100% + 180px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;animation:pmMarqueeAnim 6s ease-in-out infinite alternate!important}.pm-label-wrapper{overflow:hidden!important;width:200px!important;max-width:100%!important;display:flex!important;align-items:center!important;margin:0 auto!important}';
+		document.head.appendChild(st);
 	}
 
 	function preparePinPayload(raw) {
@@ -297,11 +287,10 @@
 			busy = true;
 			setTimeout(() => (busy = false), 1500);
 
-			showToast('⏳ Pin verisi taranıyor...', '#eab308');
 			setTimeout(() => {
 				const data = deepFind();
 				if (!data) {
-					alert('Pin verisi hafızada bulunamadı! Konsolu kontrol edin.');
+					alert('Pin verisi hafızada bulunamadı!');
 					return;
 				}
 				try {
@@ -319,7 +308,6 @@
 						a.remove();
 						URL.revokeObjectURL(url);
 					}, 4000);
-					showToast('✓ JSON Başarıyla İndirildi!', '#22c55e');
 				} catch (err) {
 					alert('Hata: ' + err.message);
 				}
@@ -335,6 +323,32 @@
 		fileInput.accept = '.json';
 		fileInput.style.display = 'none';
 		document.body.appendChild(fileInput);
+	}
+
+	function isCooldownActive(targetBtn) {
+		if (!targetBtn) return false;
+		if (targetBtn.disabled || targetBtn.getAttribute('disabled') !== null) return true;
+		if (targetBtn.classList.contains('disabled') || targetBtn.classList.contains('RectangleButton--disabled')) return true;
+		const rBtn = targetBtn.querySelector('.RectangleButton');
+		if (rBtn && (rBtn.classList.contains('RectangleButton--disabled') || rBtn.classList.contains('disabled'))) return true;
+		const txt = targetBtn.textContent.toLowerCase();
+		if (txt.includes('saat') || txt.includes('dakika') || txt.includes('hour') || txt.includes('minute')) return true;
+		return false;
+	}
+
+	function updateLabel(flbl, text) {
+		if (!flbl) return;
+		if (!flbl.parentElement.classList.contains('pm-label-wrapper')) {
+			flbl.parentElement.classList.add('pm-label-wrapper');
+		}
+		flbl.textContent = text;
+		if (text.length > 14) {
+			flbl.classList.add('pm-marquee-active');
+			flbl.parentElement.style.justifyContent = 'flex-start';
+		} else {
+			flbl.classList.remove('pm-marquee-active');
+			flbl.parentElement.style.justifyContent = 'center';
+		}
 	}
 
 	function sync() {
@@ -370,16 +384,26 @@
 						e.stopPropagation();
 					}
 
-					if (!window.__customPinPayload) {
-						alert('Kaydedilecek dosya seçilmedi! Lütfen alttaki mor butondan JSON dosyanızı seçin.');
+					if (isCooldownActive(realSaveBtn)) {
+						alert('Günlük rozet kaydetme kotanız dolmuştur. Lütfen sürenin bitmesini bekleyin.');
+						return;
+					}
+
+					let rawPayload = window.__customPinPayload;
+					if (!rawPayload) {
+						rawPayload = deepFind();
+					}
+
+					if (!rawPayload) {
+						alert('Kaydedilecek rozet verisi bulunamadı!');
 						return;
 					}
 
 					const lbl = mySaveBtn.querySelector('.pickedLabel__label');
+					const origTxt = lbl ? lbl.textContent : '';
 					if (lbl) lbl.textContent = 'KAYDEDİLİYOR...';
-					showToast('🚀 JSON Sunucuya Gönderiliyor...', '#eab308');
 
-					const payloadToSend = preparePinPayload(window.__customPinPayload);
+					const payloadToSend = preparePinPayload(rawPayload);
 					const bodyStr = JSON.stringify(payloadToSend);
 
 					try {
@@ -395,21 +419,18 @@
 						const resText = await res.text();
 
 						if (!res.ok) {
-							showToast('Hata: HTTP ' + res.status, '#ef4444');
 							alert('Supercell Sunucu Yanıtı (HTTP ' + res.status + '):\n\n' + resText);
-							if (lbl) lbl.textContent = 'ROZETİ HEMEN KAYDET';
+							if (lbl) lbl.textContent = origTxt;
 							return;
 						}
 
-						showToast('✓ Seçilen JSON Başarıyla Kaydedildi!', '#22c55e');
 						if (lbl) lbl.textContent = '✓ KAYDEDİLDİ!';
 						setTimeout(() => {
 							location.reload();
 						}, 1200);
 					} catch (err) {
-						showToast('Bağlantı Hatası: ' + err.message, '#ef4444');
 						alert('İstek gönderilemedi: ' + err.message);
-						if (lbl) lbl.textContent = 'ROZETİ HEMEN KAYDET';
+						if (lbl) lbl.textContent = origTxt;
 					}
 				}
 
@@ -422,30 +443,36 @@
 				myPickerBtn = mySaveBtn.cloneNode(true);
 				myPickerBtn.id = 'pm-json-picker-btn';
 				myPickerBtn.style.marginTop = '14px';
-				myPickerBtn.querySelector('.RectangleButton--blue')?.classList.remove('RectangleButton--blue');
 				const flbl = myPickerBtn.querySelector('.pickedLabel__label');
-				if (flbl)
-					flbl.textContent = window.__customPinFileName
-						? '✓ ' + window.__customPinFileName
-						: 'JSON DOSYASI SEÇ';
+				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName) : 'JSON DOSYASI SEÇ');
 
 				myPickerBtn.onclick = function (e) {
 					e.preventDefault();
 					e.stopPropagation();
+
+					if (isCooldownActive(realSaveBtn)) {
+						return;
+					}
+
+					fileInput.value = '';
 					fileInput.click();
 				};
 
 				fileInput.onchange = function (ev) {
 					const f = ev.target.files[0];
-					if (!f) return;
+					if (!f) {
+						window.__customPinPayload = null;
+						window.__customPinFileName = null;
+						updateLabel(flbl, 'JSON DOSYASI SEÇ');
+						return;
+					}
 					const r = new FileReader();
 					r.onload = function (eRes) {
 						try {
 							const j = JSON.parse(eRes.target.result);
 							window.__customPinPayload = j;
 							window.__customPinFileName = f.name;
-							if (flbl) flbl.textContent = '✓ ' + f.name;
-							showToast('✓ JSON Hazır! Şimdi mavi butona bas.', '#22c55e');
+							updateLabel(flbl, '✓ ' + f.name);
 						} catch (err) {
 							alert('Hata: Geçersiz JSON dosyası!');
 						}
@@ -453,7 +480,21 @@
 					r.readAsText(f);
 				};
 
+				fileInput.oncancel = function () {
+					window.__customPinPayload = null;
+					window.__customPinFileName = null;
+					updateLabel(flbl, 'JSON DOSYASI SEÇ');
+				};
+
 				mySaveBtn.parentNode.insertBefore(myPickerBtn, mySaveBtn.nextSibling);
+			}
+
+			if (myPickerBtn && isCooldownActive(realSaveBtn)) {
+				myPickerBtn.style.opacity = '0.5';
+				myPickerBtn.style.cursor = 'not-allowed';
+			} else if (myPickerBtn) {
+				myPickerBtn.style.opacity = '1';
+				myPickerBtn.style.cursor = 'pointer';
 			}
 		} else {
 			const b1 = document.getElementById('pm-my-save-btn');
@@ -470,6 +511,4 @@
 	});
 	window.__pmObserver = obs;
 	sync();
-
-	showToast('✓ Mod Menü Aktif!', '#22c55e');
 })();

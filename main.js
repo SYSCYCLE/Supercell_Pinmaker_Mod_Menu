@@ -1,6 +1,75 @@
 (function () {
 	if (window.__pmObserver) window.__pmObserver.disconnect();
 
+	const L = {
+		tr: { sel: "SPCFG DOSYASI SEÇ", sav: "KAYDEDİLİYOR...", ok: "✓ KAYDEDİLDİ!", cd: "Günlük rozet kaydetme kotanız dolmuştur. Lütfen sürenin bitmesini bekleyin.", nd: "Kaydedilecek rozet verisi bulunamadı!", inv: "Hata: Geçersiz veya şifresi çözülemeyen SPCFG dosyası!", err: "Supercell Sunucu Yanıtı" },
+		en: { sel: "SELECT SPCFG FILE", sav: "SAVING...", ok: "✓ SAVED!", cd: "Daily pin upload limit reached. Please wait for cooldown.", nd: "No pin data found to save!", inv: "Error: Invalid or corrupted SPCFG file!", err: "Supercell Server Response" },
+		es: { sel: "ELEGIR ARCHIVO SPCFG", sav: "GUARDANDO...", ok: "✓ ¡GUARDADO!", cd: "Límite diario alcanzado. Por favor espera.", nd: "¡No se encontraron datos!", inv: "¡Error: Archivo SPCFG no válido!", err: "Respuesta del servidor Supercell" },
+		de: { sel: "SPCFG-DATEI WÄHLEN", sav: "SPEICHERN...", ok: "✓ GESPEICHERT!", cd: "Tägliches Limit erreicht. Bitte warten.", nd: "Keine Daten gefunden!", inv: "Fehler: Ungültige SPCFG-Datei!", err: "Supercell-Serverantwort" },
+		fr: { sel: "CHOISIR FICHIER SPCFG", sav: "ENREGISTREMENT...", ok: "✓ ENREGISTRÉ !", cd: "Limite quotidienne atteinte. Veuillez patienter.", nd: "Aucune donnée trouvée !", inv: "Erreur : Fichier SPCFG invalide !", err: "Réponse du serveur Supercell" },
+		it: { sel: "SCEGLI FILE SPCFG", sav: "SALVATAGGIO...", ok: "✓ SALVATO!", cd: "Limite giornaliero raggiunto. Attendi.", nd: "Nessun dato trovato!", inv: "Errore: File SPCFG non valido!", err: "Risposta server Supercell" },
+		pt: { sel: "ESCOLHER ARQUIVO SPCFG", sav: "SALVANDO...", ok: "✓ SALVO!", cd: "Limite diário atingido. Por favor aguarde.", nd: "Nenhum dado encontrado!", inv: "Erro: Arquivo SPCFG inválido!", err: "Resposta do servidor Supercell" },
+		ru: { sel: "ВЫБРАТЬ ФАЙЛ SPCFG", sav: "СОХРАНЕНИЕ...", ok: "✓ СОХРАНЕНО!", cd: "Дневной лимит исчерпан. Пожалуйста, подождите.", nd: "Данные пина не найдены!", inv: "Ошибка: Неверный файл SPCFG!", err: "Ответ сервера Supercell" },
+		pl: { sel: "WYBIERZ PLIK SPCFG", sav: "ZAPISYWANIE...", ok: "✓ ZAPISANO!", cd: "Osiągnięto dzienny limit. Proszę czekać.", nd: "Nie znaleziono danych!", inv: "Błąd: Nieprawidłowy plik SPCFG!", err: "Odpowiedź serwera Supercell" },
+		jp: { sel: "SPCFGファイルを選択", sav: "保存中...", ok: "✓ 保存完了！", cd: "1日の保存制限に達しました。お待ちください。", nd: "データが見つかりません！", inv: "エラー: 無効なSPCFGファイルです！", err: "Supercellサーバーの応答" },
+		kr: { sel: "SPCFG 파일 선택", sav: "저장 중...", ok: "✓ 저장 완료!", cd: "일일 저장 한도에 도달했습니다. 잠시 기다려주세요.", nd: "데이터를 찾을 수 없습니다!", inv: "오류: 유효하지 않은 SPCFG 파일입니다!", err: "Supercell 서버 응답" },
+		"zh-hans": { sel: "选择 SPCFG 文件", sav: "保存中...", ok: "✓ 已保存！", cd: "已达到每日保存限制。请稍候。", nd: "未找到可保存的数据！", inv: "错误：无效的 SPCFG 文件！", err: "Supercell 服务器响应" },
+		"zh-hant": { sel: "選擇 SPCFG 檔案", sav: "儲存中...", ok: "✓ 已儲存！", cd: "已達每日儲存上限。請稍候。", nd: "找不到可儲存的資料！", inv: "錯誤：無效的 SPCFG 檔案！", err: "Supercell 伺服器回應" },
+		ar: { sel: "اختر ملف SPCFG", sav: "جارٍ الحفظ...", ok: "✓ تم الحفظ!", cd: "تم الوصول إلى الحد اليومي. يرجى الانتظار.", nd: "لم يتم العثور على بيانات!", inv: "خطأ: ملف SPCFG غير صالح!", err: "استجابة خادم Supercell" },
+		da: { sel: "VÆLG SPCFG-FIL", sav: "GEMMER...", ok: "✓ GEMT!", cd: "Daglig grænse nået.", nd: "Ingen data fundet!", inv: "Ugyldig SPCFG-fil!", err: "Supercell-serversvar" },
+		nl: { sel: "KIES SPCFG-BESTAND", sav: "OPSLAAN...", ok: "✓ OPGESLAGEN!", cd: "Dagelijkse limiet bereikt.", nd: "Geen gegevens gevonden!", inv: "Ongeldig SPCFG-bestand!", err: "Supercell-serverreactie" },
+		fi: { sel: "VALITSE SPCFG-TIEDOSTO", sav: "TALLENNETAAN...", ok: "✓ TALLENNETTU!", cd: "Päivittäinen raja saavutettu.", nd: "Tietoja ei löytynyt!", inv: "Virheellinen SPCFG-tiedosto!", err: "Supercell-palvelinvastaus" },
+		sv: { sel: "VÄLJ SPCFG-FIL", sav: "SPARAR...", ok: "✓ SPARAD!", cd: "Daglig gräns nådd.", nd: "Ingen data hittades!", inv: "Ogiltig SPCFG-fil!", err: "Supercell-serversvar" },
+		no: { sel: "VELG SPCFG-FIL", sav: "LAGRER...", ok: "✓ LAGRET!", cd: "Daglig grense nådd.", nd: "Ingen data funnet!", inv: "Ugyldig SPCFG-fil!", err: "Supercell-serversvar" },
+		th: { sel: "เลือกไฟล์ SPCFG", sav: "กำลังบันทึก...", ok: "✓ บันทึกแล้ว!", cd: "ถึงขีดจำกัดรายวันแล้ว", nd: "ไม่พบข้อมูล!", inv: "ไฟล์ SPCFG ไม่ถูกต้อง!", err: "การตอบกลับของเซิร์ฟเวอร์ Supercell" },
+		vi: { sel: "CHỌN TỆP SPCFG", sav: "ĐANG LƯU...", ok: "✓ ĐÃ LƯU!", cd: "Đã đạt giới hạn hàng ngày.", nd: "Không tìm thấy dữ liệu!", inv: "Tệp SPCFG không hợp lệ!", err: "Phản hồi máy chủ Supercell" },
+		id: { sel: "PILIH FILE SPCFG", sav: "MENYIMPAN...", ok: "✓ TERSIMPAN!", cd: "Batas harian tercapai.", nd: "Data tidak ditemukan!", inv: "File SPCFG tidak valid!", err: "Respons Server Supercell" },
+		ms: { sel: "PILIH FAIL SPCFG", sav: "MENYIMPAN...", ok: "✓ DISIMPAN!", cd: "Had harian dicapai.", nd: "Data tidak dijumpai!", inv: "Fail SPCFG tidak sah!", err: "Respons Pelayan Supercell" },
+		he: { sel: "בחר קובץ SPCFG", sav: "...שומר", ok: "!נשמר ✓", cd: "הגעת למגבלה היומית.", nd: "!לא נמצאו נתונים", inv: "!שגוי SPCFG קובץ", err: "Supercell תגובת שרת" },
+		fa: { sel: "انتخاب فایل SPCFG", sav: "...در حال ذخیره", ok: "!ذخیره شد ✓", cd: "محدودیت روزانه پر شده است.", nd: "!داده‌ای یافت نشد", inv: "نامعتبر است SPCFG فایل", err: "Supercell پاسخ سرور" }
+	};
+
+	function getLang() {
+		const p = location.pathname.toLowerCase();
+		const m = p.match(/\/(ar|da|de|en|es|fa|fi|fr|he|it|jp|kr|ms|id|nl|no|pl|pt|ru|sv|th|tr|vi|zh-hans|zh-hant)/);
+		return m ? m[1] : (navigator.language?.toLowerCase().startsWith('tr') ? 'tr' : 'en');
+	}
+
+	function tr(key) {
+		const lang = getLang();
+		return (L[lang] && L[lang][key]) ? L[lang][key] : (L.en[key] || '');
+	}
+
+	async function getCryptoKey() {
+		const kStr = [173, 248, 246, 252, 173, 168, 169, 255, 247, 250, 175, 171, 189].map(c => String.fromCharCode(c ^ 206)).join('');
+		const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(kStr));
+		return crypto.subtle.importKey('raw', hash, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+	}
+
+	async function encryptData(plainText) {
+		const key = await getCryptoKey();
+		const iv = crypto.getRandomValues(new Uint8Array(12));
+		const encoded = new TextEncoder().encode(plainText);
+		const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+		const combined = new Uint8Array(iv.length + encrypted.byteLength);
+		combined.set(iv);
+		combined.set(new Uint8Array(encrypted), iv.length);
+		let binary = '';
+		for (let i = 0; i < combined.length; i++) binary += String.fromCharCode(combined[i]);
+		return btoa(binary);
+	}
+
+	async function decryptData(base64Str) {
+		const key = await getCryptoKey();
+		const binary = atob(base64Str.trim());
+		const bytes = new Uint8Array(binary.length);
+		for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+		const iv = bytes.slice(0, 12);
+		const ciphertext = bytes.slice(12);
+		const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+		return new TextDecoder().decode(decrypted);
+	}
+
 	if (!document.getElementById('pm-marquee-style')) {
 		const st = document.createElement('style');
 		st.id = 'pm-marquee-style';
@@ -278,7 +347,7 @@
 		}
 
 		let busy = false;
-		topBtn.onclick = function (e) {
+		topBtn.onclick = async function (e) {
 			if (e) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -287,31 +356,30 @@
 			busy = true;
 			setTimeout(() => (busy = false), 1500);
 
-			setTimeout(() => {
-				const data = deepFind();
-				if (!data) {
-					alert('Pin verisi hafızada bulunamadı!');
-					return;
-				}
-				try {
-					const str = JSON.stringify(data, null, 2);
-					const blob = new Blob([str], {
-						type: 'application/json'
-					});
-					const url = URL.createObjectURL(blob);
-					const a = document.createElement('a');
-					a.href = url;
-					a.download = 'pin_config_' + Date.now() + '.json';
-					document.body.appendChild(a);
-					a.click();
-					setTimeout(() => {
-						a.remove();
-						URL.revokeObjectURL(url);
-					}, 4000);
-				} catch (err) {
-					alert('Hata: ' + err.message);
-				}
-			}, 80);
+			const data = deepFind();
+			if (!data) {
+				alert(tr('nd'));
+				return;
+			}
+			try {
+				const str = JSON.stringify(data);
+				const encryptedBase64 = await encryptData(str);
+				const blob = new Blob([encryptedBase64], {
+					type: 'text/plain;charset=utf-8'
+				});
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = 'pin_config_' + Date.now() + '.spcfg';
+				document.body.appendChild(a);
+				a.click();
+				setTimeout(() => {
+					a.remove();
+					URL.revokeObjectURL(url);
+				}, 4000);
+			} catch (err) {
+				alert('Hata: ' + err.message);
+			}
 		};
 	}
 
@@ -320,7 +388,7 @@
 		fileInput = document.createElement('input');
 		fileInput.id = 'pm-hidden-file-input';
 		fileInput.type = 'file';
-		fileInput.accept = '.json';
+		fileInput.accept = '.spcfg,.json';
 		fileInput.style.display = 'none';
 		document.body.appendChild(fileInput);
 	}
@@ -338,16 +406,26 @@
 
 	function updateLabel(flbl, text) {
 		if (!flbl) return;
-		const isFile = !!window.__customPinFileName;
-		if (flbl.parentElement) {
-			flbl.parentElement.style.cssText = 'width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;overflow:hidden!important;margin:0 auto!important;';
-		}
-		if (isFile && text.length > 18) {
-			flbl.style.cssText = 'width:100%!important;text-align:left!important;display:block!important;overflow:hidden!important;';
-			flbl.innerHTML = '<span class="pm-marquee-active">' + text + '</span>';
+		const defaultText = tr('sel');
+		if (!window.__customPinFileName || text === defaultText) {
+			flbl.classList.remove('pm-marquee-active');
+			flbl.style.cssText = 'width:100%!important;text-align:center!important;display:block!important;margin:0 auto!important;';
+			if (flbl.parentElement) {
+				flbl.parentElement.style.cssText = 'width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;overflow:hidden!important;margin:0 auto!important;';
+			}
+			flbl.textContent = defaultText;
 		} else {
-			flbl.style.cssText = 'width:100%!important;text-align:center!important;display:block!important;';
-			flbl.textContent = text;
+			if (flbl.parentElement) {
+				flbl.parentElement.style.cssText = 'width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;overflow:hidden!important;margin:0 auto!important;';
+			}
+			if (text.length > 18) {
+				flbl.style.cssText = 'width:100%!important;text-align:left!important;display:block!important;overflow:hidden!important;margin:0 auto!important;';
+				flbl.innerHTML = '<span class="pm-marquee-active">' + text + '</span>';
+			} else {
+				flbl.classList.remove('pm-marquee-active');
+				flbl.style.cssText = 'width:100%!important;text-align:center!important;display:block!important;margin:0 auto!important;';
+				flbl.textContent = text;
+			}
 		}
 	}
 
@@ -385,7 +463,7 @@
 					}
 
 					if (isCooldownActive(realSaveBtn)) {
-						alert('Günlük rozet kaydetme kotanız dolmuştur. Lütfen sürenin bitmesini bekleyin.');
+						alert(tr('cd'));
 						return;
 					}
 
@@ -395,13 +473,13 @@
 					}
 
 					if (!rawPayload) {
-						alert('Kaydedilecek rozet verisi bulunamadı!');
+						alert(tr('nd'));
 						return;
 					}
 
 					const lbl = mySaveBtn.querySelector('.pickedLabel__label');
 					const origTxt = lbl ? lbl.textContent : '';
-					if (lbl) lbl.textContent = 'KAYDEDİLİYOR...';
+					if (lbl) lbl.textContent = tr('sav');
 
 					const payloadToSend = preparePinPayload(rawPayload);
 					const bodyStr = JSON.stringify(payloadToSend);
@@ -419,12 +497,12 @@
 						const resText = await res.text();
 
 						if (!res.ok) {
-							alert('Supercell Sunucu Yanıtı (HTTP ' + res.status + '):\n\n' + resText);
+							alert(tr('err') + ' (HTTP ' + res.status + '):\n\n' + resText);
 							if (lbl) lbl.textContent = origTxt;
 							return;
 						}
 
-						if (lbl) lbl.textContent = '✓ KAYDEDİLDİ!';
+						if (lbl) lbl.textContent = tr('ok');
 						setTimeout(() => {
 							location.reload();
 						}, 1200);
@@ -444,7 +522,7 @@
 				myPickerBtn.id = 'pm-json-picker-btn';
 				myPickerBtn.style.marginTop = '14px';
 				const flbl = myPickerBtn.querySelector('.pickedLabel__label');
-				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName) : 'JSON DOSYASI SEÇ');
+				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName) : tr('sel'));
 
 				myPickerBtn.onclick = function (e) {
 					e.preventDefault();
@@ -463,19 +541,30 @@
 					if (!f) {
 						window.__customPinPayload = null;
 						window.__customPinFileName = null;
-						updateLabel(flbl, 'JSON DOSYASI SEÇ');
+						updateLabel(flbl, tr('sel'));
 						return;
 					}
 					const r = new FileReader();
-					r.onload = function (eRes) {
+					r.onload = async function (eRes) {
+						const fileText = eRes.target.result;
+						let parsedData = null;
 						try {
-							const j = JSON.parse(eRes.target.result);
-							window.__customPinPayload = j;
-							window.__customPinFileName = f.name;
-							updateLabel(flbl, '✓ ' + f.name);
-						} catch (err) {
-							alert('Hata: Geçersiz JSON dosyası!');
+							const decryptedText = await decryptData(fileText);
+							parsedData = JSON.parse(decryptedText);
+						} catch (decErr) {
+							try {
+								parsedData = JSON.parse(fileText);
+							} catch (jsonErr) {
+								alert(tr('inv'));
+								window.__customPinPayload = null;
+								window.__customPinFileName = null;
+								updateLabel(flbl, tr('sel'));
+								return;
+							}
 						}
+						window.__customPinPayload = parsedData;
+						window.__customPinFileName = f.name;
+						updateLabel(flbl, '✓ ' + f.name);
 					};
 					r.readAsText(f);
 				};
@@ -483,7 +572,7 @@
 				fileInput.oncancel = function () {
 					window.__customPinPayload = null;
 					window.__customPinFileName = null;
-					updateLabel(flbl, 'JSON DOSYASI SEÇ');
+					updateLabel(flbl, tr('sel'));
 				};
 
 				mySaveBtn.parentNode.insertBefore(myPickerBtn, mySaveBtn.nextSibling);

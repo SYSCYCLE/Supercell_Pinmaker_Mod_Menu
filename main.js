@@ -4,7 +4,7 @@
 	if (!document.getElementById('pm-marquee-style')) {
 		const st = document.createElement('style');
 		st.id = 'pm-marquee-style';
-		st.textContent = '@keyframes pmMarqueeAnim{0%,20%{transform:translateX(0%)}80%,100%{transform:translateX(calc(-100% + 180px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;animation:pmMarqueeAnim 6s ease-in-out infinite alternate!important}.pm-label-wrapper{overflow:hidden!important;width:200px!important;max-width:100%!important;display:flex!important;align-items:center!important;margin:0 auto!important}';
+		st.textContent = '@keyframes pmMarqueeAnim{0%,20%{transform:translateX(0%)}80%,100%{transform:translateX(calc(-100% + 180px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;animation:pmMarqueeAnim 6s ease-in-out infinite alternate!important}';
 		document.head.appendChild(st);
 	}
 
@@ -338,16 +338,16 @@
 
 	function updateLabel(flbl, text) {
 		if (!flbl) return;
-		if (!flbl.parentElement.classList.contains('pm-label-wrapper')) {
-			flbl.parentElement.classList.add('pm-label-wrapper');
+		const isFile = !!window.__customPinFileName;
+		if (flbl.parentElement) {
+			flbl.parentElement.style.cssText = 'width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important;overflow:hidden!important;margin:0 auto!important;';
 		}
-		flbl.textContent = text;
-		if (text.length > 14) {
-			flbl.classList.add('pm-marquee-active');
-			flbl.parentElement.style.justifyContent = 'flex-start';
+		if (isFile && text.length > 18) {
+			flbl.style.cssText = 'width:100%!important;text-align:left!important;display:block!important;overflow:hidden!important;';
+			flbl.innerHTML = '<span class="pm-marquee-active">' + text + '</span>';
 		} else {
-			flbl.classList.remove('pm-marquee-active');
-			flbl.parentElement.style.justifyContent = 'center';
+			flbl.style.cssText = 'width:100%!important;text-align:center!important;display:block!important;';
+			flbl.textContent = text;
 		}
 	}
 
@@ -489,12 +489,14 @@
 				mySaveBtn.parentNode.insertBefore(myPickerBtn, mySaveBtn.nextSibling);
 			}
 
-			if (myPickerBtn && isCooldownActive(realSaveBtn)) {
-				myPickerBtn.style.opacity = '0.5';
-				myPickerBtn.style.cursor = 'not-allowed';
-			} else if (myPickerBtn) {
-				myPickerBtn.style.opacity = '1';
-				myPickerBtn.style.cursor = 'pointer';
+			if (mySaveBtn && realSaveBtn) {
+				const realRBtn = realSaveBtn.querySelector('.RectangleButton');
+				const myRBtn = mySaveBtn.querySelector('.RectangleButton');
+				const pickerRBtn = myPickerBtn ? myPickerBtn.querySelector('.RectangleButton') : null;
+				if (realRBtn && myRBtn) {
+					myRBtn.className = realRBtn.className;
+					if (pickerRBtn) pickerRBtn.className = realRBtn.className;
+				}
 			}
 		} else {
 			const b1 = document.getElementById('pm-my-save-btn');

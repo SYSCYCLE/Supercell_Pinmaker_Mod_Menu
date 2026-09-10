@@ -1,39 +1,4 @@
-"use strict";
-
-(() => {
-	const redirectUrl = "https://syscycle.github.io/protectdebugging/chrome";
-
-	function triggerDetect() {
-		document.documentElement.innerHTML = "";
-		window.location.replace(redirectUrl);
-	}
-
-	window.addEventListener("keydown", (e) => {
-		if (
-			e.key === "F12" ||
-			(e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key.toUpperCase())) ||
-			(e.ctrlKey && e.key.toUpperCase() === "U")
-		) {
-			e.preventDefault();
-			e.stopPropagation();
-			triggerDetect();
-		}
-	}, true);
-
-	function check() {
-		if (document.hidden) return;
-		const t0 = performance.now();
-		debugger;
-		const t1 = performance.now();
-		if (t1 - t0 > 200) {
-			triggerDetect();
-		}
-	}
-
-	setInterval(check, 1000);
-})();
-
-(function initPinMakerMod() {
+(function () {
 	if (window.__pmObserver) window.__pmObserver.disconnect();
 
 	const L = {
@@ -323,8 +288,8 @@
 			}
 			if (e._vnode?.component) {
 				const r =
-					scan(e._vnode.component.proxy) ||
-					scan(e._vnode.component.setupState);
+				scan(e._vnode.component.proxy) ||
+				scan(e._vnode.component.setupState);
 				if (r) return r;
 			}
 		}
@@ -384,11 +349,13 @@
 		topBtn.classList.remove('download-button');
 		topBtn.classList.add('download-config-button');
 		const img = topBtn.querySelector('img');
-		const cdn = 'https://cdn.jsdelivr.net/gh/SYSCYCLE/Supercell_Pinmaker_Mod_Menu@main/img/download-config-button.5b58b40f.svg';
+		const cdn =
+		'https://cdn.jsdelivr.net/gh/SYSCYCLE/Supercell_Pinmaker_Mod_Menu@main/img/download-config-button.5b58b40f.svg';
 		if (img) {
 			img.src = cdn;
 		} else {
-			topBtn.innerHTML = '<img src="' + cdn + '" style="width:100%;height:100%;">';
+			topBtn.innerHTML =
+			'<img src="' + cdn + '" style="width:100%;height:100%;">';
 		}
 
 		let busy = false;

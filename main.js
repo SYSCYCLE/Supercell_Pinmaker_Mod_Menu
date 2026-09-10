@@ -85,7 +85,7 @@
 	if (!document.getElementById('pm-marquee-style')) {
 		const st = document.createElement('style');
 		st.id = 'pm-marquee-style';
-		st.textContent = '@keyframes pmMarqueeAnim{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(calc(-100% + 160px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;animation:pmMarqueeAnim 5s ease-in-out infinite alternate!important}';
+		st.textContent = '@keyframes pmMarqueeAnim{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(calc(-100% + 160px))}}.pm-marquee-active{display:inline-block!important;white-space:nowrap!important;font-size:18px!important;animation:pmMarqueeAnim 5s ease-in-out infinite alternate!important}';
 		document.head.appendChild(st);
 	}
 
@@ -427,23 +427,41 @@
 			bg.style.padding = '0 10px';
 		}
 
-		const pBox = flbl.closest('.pickedLabel__container') || flbl.parentElement;
-		if (pBox) {
-			pBox.style.cssText = 'width:160px!important;max-width:160px!important;min-width:0!important;overflow:hidden!important;display:flex!important;align-items:center!important;margin:0 auto!important;';
-		}
-
 		const pl = flbl.closest('.pickedLabel');
 		if (pl) {
-			pl.style.cssText = 'width:160px!important;max-width:160px!important;overflow:hidden!important;margin:0 auto!important;';
+			pl.style.width = '160px';
+			pl.style.maxWidth = '160px';
+			pl.style.overflow = 'hidden';
+			pl.style.margin = '0 auto';
+			pl.style.setProperty('--size', '18px');
 		}
+
+		const pBox = flbl.closest('.pickedLabel__container') || flbl.parentElement;
+		if (pBox) {
+			pBox.style.width = '160px';
+			pBox.style.maxWidth = '160px';
+			pBox.style.minWidth = '0';
+			pBox.style.overflow = 'hidden';
+			pBox.style.display = 'flex';
+			pBox.style.alignItems = 'center';
+			pBox.style.margin = '0 auto';
+		}
+
+		flbl.style.fontSize = '18px';
+		flbl.style.setProperty('font-size', '18px', 'important');
+		flbl.style.lineHeight = '1';
 
 		if (isFile && text.length > 14) {
 			if (pBox) pBox.style.justifyContent = 'flex-start';
-			flbl.style.cssText = 'display:inline-block!important;overflow:visible!important;white-space:nowrap!important;';
+			flbl.style.display = 'inline-block';
+			flbl.style.whiteSpace = 'nowrap';
 			flbl.innerHTML = '<span class="pm-marquee-active">' + text + '</span>';
 		} else {
 			if (pBox) pBox.style.justifyContent = 'center';
-			flbl.style.cssText = 'width:100%!important;text-align:center!important;display:block!important;white-space:nowrap!important;overflow:hidden!important;';
+			flbl.style.width = '100%';
+			flbl.style.textAlign = 'center';
+			flbl.style.display = 'block';
+			flbl.style.whiteSpace = 'nowrap';
 			flbl.textContent = text;
 		}
 	}

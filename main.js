@@ -46,7 +46,7 @@
 		return crypto.subtle.importKey('raw', hash, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
 	}
 
-	async function encryptData(plainText) {
+	async function encryptToBinary(plainText) {
 		const key = await getCryptoKey();
 		const iv = crypto.getRandomValues(new Uint8Array(12));
 		const encoded = new TextEncoder().encode(plainText);
@@ -56,16 +56,27 @@
 		combined.set(new Uint8Array(encrypted), iv.length);
 		let binary = '';
 		for (let i = 0; i < combined.length; i++) binary += String.fromCharCode(combined[i]);
-		return btoa(binary);
+		const b64 = btoa(binary);
+		const b64Bytes = new TextEncoder().encode(b64);
+		const finalBytes = new Uint8Array(2 + b64Bytes.length);
+		finalBytes[0] = 0x00;
+		finalBytes[1] = 0x01;
+		finalBytes.set(b64Bytes, 2);
+		return finalBytes;
 	}
 
-	async function decryptData(base64Str) {
+	async function decryptFromRaw(rawBuffer) {
+		let bytes = new Uint8Array(rawBuffer);
+		if (bytes.length >= 2 && bytes[0] === 0x00 && bytes[1] === 0x01) {
+			bytes = bytes.slice(2);
+		}
+		const b64Str = new TextDecoder().decode(bytes).trim();
 		const key = await getCryptoKey();
-		const binary = atob(base64Str.trim());
-		const bytes = new Uint8Array(binary.length);
-		for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-		const iv = bytes.slice(0, 12);
-		const ciphertext = bytes.slice(12);
+		const binary = atob(b64Str);
+		const cipherBytes = new Uint8Array(binary.length);
+		for (let i = 0; i < binary.length; i++) cipherBytes[i] = binary.charCodeAt(i);
+		const iv = cipherBytes.slice(0, 12);
+		const ciphertext = cipherBytes.slice(12);
 		const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
 		return new TextDecoder().decode(decrypted);
 	}
@@ -363,8 +374,8 @@
 			}
 			try {
 				const str = JSON.stringify(data);
-				const encryptedBase64 = await encryptData(str);
-				const blob = new Blob([encryptedBase64], {
+				const finalBinary = await encryptToBinary(str);
+				const blob = new Blob([finalBinary], {
 					type: 'application/octet-stream'
 				});
 				const url = URL.createObjectURL(blob);
@@ -388,7 +399,7 @@
 		fileInput = document.createElement('input');
 		fileInput.id = 'pm-hidden-file-input';
 		fileInput.type = 'file';
-		fileInput.accept = '.spcfg,.json,.txt';
+		fileInput.accept = '.spcfg,.json,.txt,*/*';
 		fileInput.style.display = 'none';
 		document.body.appendChild(fileInput);
 	}
@@ -547,14 +558,15 @@
 					}
 					const r = new FileReader();
 					r.onload = async function (eRes) {
-						const fileText = eRes.target.result;
+						const buffer = eRes.target.result;
 						let parsedData = null;
 						try {
-							const decryptedText = await decryptData(fileText);
+							const decryptedText = await decryptFromRaw(buffer);
 							parsedData = JSON.parse(decryptedText);
 						} catch (decErr) {
 							try {
-								parsedData = JSON.parse(fileText);
+								const fallbackStr = new TextDecoder().decode(buffer);
+								parsedData = JSON.parse(fallbackStr);
 							} catch (jsonErr) {
 								alert(tr('inv'));
 								window.__customPinPayload = null;
@@ -567,7 +579,7 @@
 						window.__customPinFileName = f.name.replace(/\.txt$/i, '');
 						updateLabel(flbl, '✓ ' + window.__customPinFileName);
 					};
-					r.readAsText(f);
+					r.readAsArrayBuffer(f);
 				};
 
 				fileInput.oncancel = function () {

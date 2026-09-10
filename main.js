@@ -2,121 +2,55 @@
 	if (window.__pmObserver) window.__pmObserver.disconnect();
 
 	const L = {
-		tr: {
-			inv: "Hata: Yalnızca geçerli .spcfg dosyaları yüklenebilir!"
-		},
-		en: {
-			inv: "Error: Only valid .spcfg files are accepted!"
-		},
-		es: {
-			inv: "¡Error: Solo se aceptan archivos .spcfg válidos!"
-		},
-		de: {
-			inv: "Fehler: Nur gültige .spcfg-Dateien werden akzeptiert!"
-		},
-		fr: {
-			inv: "Erreur : Seuls les fichiers .spcfg valides sont acceptés !"
-		},
-		it: {
-			inv: "Errore: Sono accettati solo file .spcfg validi!"
-		},
-		pt: {
-			inv: "Erro: Apenas arquivos .spcfg válidos são aceitos!"
-		},
-		ru: {
-			inv: "Ошибка: Принимаются только действительные файлы .spcfg!"
-		},
-		pl: {
-			inv: "Błąd: Akceptowane są tylko prawidłowe pliki .spcfg!"
-		},
-		jp: {
-			inv: "エラー: 有効な .spcfg ファイルのみ受け入れられます！"
-		},
-		kr: {
-			inv: "오류: 유효한 .spcfg 파일만 업로드할 수 있습니다!"
-		},
-		"zh-hans": {
-			inv: "错误：仅支持有效的 .spcfg 文件！"
-		},
-		"zh-hant": {
-			inv: "錯誤：僅支援有效的 .spcfg 檔案！"
-		},
-		ar: {
-			inv: "خطأ: يتم قبول ملفات .spcfg الصالحة فقط!"
-		},
-		da: {
-			inv: "Kun gyldige .spcfg-filer accepteres!"
-		},
-		nl: {
-			inv: "Alleen geldige .spcfg-bestanden worden geaccepteerd!"
-		},
-		fi: {
-			inv: "Vain kelvollisia .spcfg-tiedostoja hyväksytään!"
-		},
-		sv: {
-			inv: "Endast giltiga .spcfg-filer accepteras!"
-		},
-		no: {
-			inv: "Bare gyldige .spcfg-filer godtas!"
-		},
-		th: {
-			inv: "ยอมรับเฉพาะไฟล์ .spcfg ที่ถูกต้องเท่านั้น!"
-		},
-		vi: {
-			inv: "Chỉ chấp nhận các tệp .spcfg hợp lệ!"
-		},
-		id: {
-			inv: "Hanya file .spcfg yang valid yang diterima!"
-		},
-		ms: {
-			inv: "Hanya fail .spcfg yang sah diterima!"
-		},
-		he: {
-			inv: "מתקבלים רק קובצי .spcfg תקינים!"
-		},
-		fa: {
-			inv: "فقط فایل‌های معتبر .spcfg پذیرفته می‌شوند!"
-		}
+		tr: { sel: "SPCFG DOSYASI SEÇ", sav: "KAYDEDİLİYOR...", ok: "✓ KAYDEDİLDİ!", cd: "Günlük rozet kaydetme kotanız dolmuştur. Lütfen sürenin bitmesini bekleyin.", nd: "Kaydedilecek rozet verisi bulunamadı!", inv: "Hata: Yalnızca geçerli .spcfg dosyaları yüklenebilir!", err: "Supercell Sunucu Yanıtı" },
+		en: { sel: "SELECT SPCFG FILE", sav: "SAVING...", ok: "✓ SAVED!", cd: "Daily pin upload limit reached. Please wait for cooldown.", nd: "No pin data found to save!", inv: "Error: Only valid .spcfg files are accepted!", err: "Supercell Server Response" },
+		es: { sel: "ELEGIR ARCHIVO SPCFG", sav: "GUARDANDO...", ok: "✓ ¡GUARDADO!", cd: "Límite diario alcanzado. Por favor espera.", nd: "¡No se encontraron datos!", inv: "¡Error: Solo se aceptan archivos .spcfg válidos!", err: "Respuesta del servidor Supercell" },
+		de: { sel: "SPCFG-DATEI WÄHLEN", sav: "SPEICHERN...", ok: "✓ GESPEICHERT!", cd: "Tägliches Limit erreicht. Bitte warten.", nd: "Keine Daten gefunden!", inv: "Fehler: Nur gültige .spcfg-Dateien werden akzeptiert!", err: "Supercell-Serverantwort" },
+		fr: { sel: "CHOISIR FICHIER SPCFG", sav: "ENREGISTREMENT...", ok: "✓ ENREGISTRÉ !", cd: "Limite quotidienne atteinte. Veuillez patienter.", nd: "Aucune donnée trouvée !", inv: "Erreur : Seuls les fichiers .spcfg valides sont acceptés !", err: "Réponse du serveur Supercell" },
+		it: { sel: "SCEGLI FILE SPCFG", sav: "SALVATAGGIO...", ok: "✓ SALVATO!", cd: "Limite giornaliero raggiunto. Attendi.", nd: "Nessun dato trovato!", inv: "Errore: Sono accettati solo file .spcfg validi!", err: "Risposta server Supercell" },
+		pt: { sel: "ESCOLHER ARQUIVO SPCFG", sav: "SALVANDO...", ok: "✓ SALVO!", cd: "Limite diário atingido. Por favor aguarde.", nd: "Nenhum dato encontrado!", inv: "Erro: Apenas arquivos .spcfg válidos são aceitos!", err: "Resposta do servidor Supercell" },
+		ru: { sel: "ВЫБРАТЬ ФАЙЛ SPCFG", sav: "СОХРАНЕНИЕ...", ok: "✓ СОХРАНЕНО!", cd: "Дневной лимит исчерпан. Пожалуйста, подождите.", nd: "Данные пина не найдены!", inv: "Ошибка: Принимаются только корректные файлы .spcfg!", err: "Ответ сервера Supercell" },
+		pl: { sel: "WYBIERZ PLIK SPCFG", sav: "ZAPISYWANIE...", ok: "✓ ZAPISANO!", cd: "Osiągnięto dzienny limit. Proszę czekać.", nd: "Nie znaleziono danych!", inv: "Błąd: Akceptowane są tylko prawidłowe pliki .spcfg!", err: "Odpowiedź serwera Supercell" },
+		jp: { sel: "SPCFGファイルを選択", sav: "保存中...", ok: "✓ 保存完了！", cd: "1日の保存制限に達しました。お待ちください。", nd: "データが見つかりません！", inv: "エラー: 有効な .spcfg ファイルのみ受け入れられます！", err: "Supercellサーバーの応答" },
+		kr: { sel: "SPCFG 파일 선택", sav: "저장 중...", ok: "✓ 저장 완료!", cd: "일일 저장 한도에 도달했습니다. 잠시 기다려주세요.", nd: "데이터를 찾을 수 없습니다!", inv: "오류: 유효한 .spcfg 파일만 업로드할 수 있습니다!", err: "Supercell 서버 응답" },
+		"zh-hans": { sel: "选择 SPCFG 文件", sav: "保存中...", ok: "✓ 已保存！", cd: "已达到每日保存限制。请稍候。", nd: "未找到可保存的数据！", inv: "错误：仅支持有效的 .spcfg 文件！", err: "Supercell 服务器响应" },
+		"zh-hant": { sel: "選擇 SPCFG 檔案", sav: "儲存中...", ok: "✓ 已儲存！", cd: "已達每日儲存上限。請稍候。", nd: "找不到可儲存的資料！", inv: "錯誤：僅支援有效的 .spcfg 檔案！", err: "Supercell 伺服器回應" },
+		ar: { sel: "اختر ملف SPCFG", sav: "جارٍ الحفظ...", ok: "✓ تم الحفظ!", cd: "تم الوصول إلى الحد اليومي. يرجى الانتظار.", nd: "لم يتم العثور على بيانات!", inv: "خطأ: يتم قبول ملفات .spcfg الصالحة فقط!", err: "استجابة خادم Supercell" },
+		da: { sel: "VÆLG SPCFG-FIL", sav: "GEMMER...", ok: "✓ GEMT!", cd: "Daglig grænse nået.", nd: "Ingen data fundet!", inv: "Kun gyldige .spcfg-filer accepteres!", err: "Supercell-serversvar" },
+		nl: { sel: "KIES SPCFG-BESTAND", sav: "OPSLAAN...", ok: "✓ OPGESLAGEN!", cd: "Dagelijkse limiet bereikt.", nd: "Geen gegevens gevonden!", inv: "Alleen geldige .spcfg-bestanden worden geaccepteerd!", err: "Supercell-serverreactie" },
+		fi: { sel: "VALITSE SPCFG-TIEDOSTO", sav: "TALLENNETAAN...", ok: "✓ TALLENNETTU!", cd: "Päivittäinen raja saavutettu.", nd: "Tietoja ei löytynyt!", inv: "Vain kelvollisia .spcfg-tiedostoja hyväksytään!", err: "Supercell-palvelinvastaus" },
+		sv: { sel: "VÄLJ SPCFG-FIL", sav: "SPARAR...", ok: "✓ SPARAD!", cd: "Daglig gräns nådd.", nd: "Ingen data hittades!", inv: "Endast giltiga .spcfg-filer accepteras!", err: "Supercell-serversvar" },
+		no: { sel: "VELG SPCFG-FIL", sav: "LAGRER...", ok: "✓ LAGRET!", cd: "Daglig grense nådd.", nd: "Ingen data funnet!", inv: "Bare gyldige .spcfg-filer godtas!", err: "Supercell-serversvar" },
+		th: { sel: "เลือกไฟล์ SPCFG", sav: "กำลังบันทึก...", ok: "✓ บันทึกแล้ว!", cd: "ถึงขีดจำกัดรายวันแล้ว", nd: "ไม่พบข้อมูล!", inv: "ยอมรับเฉพาะไฟล์ .spcfg ที่ถูกต้องเท่านั้น!", err: "การตอบกลับของเซิรฟ์เวอร์ Supercell" },
+		vi: { sel: "CHỌN TỆP SPCFG", sav: "ĐANG LƯU...", ok: "✓ ĐÃ LƯU!", cd: "Đã đạt giới hạn hàng ngày.", nd: "Không tìm thấy dữ liệu!", inv: "Chỉ chấp nhận các tệp .spcfg hợp lệ!", err: "Phản hồi máy chủ Supercell" },
+		id: { sel: "PILIH FILE SPCFG", sav: "MENYIMPAN...", ok: "✓ TERSIMPAN!", cd: "Batas harian tercapai.", nd: "Data tidak ditemukan!", inv: "Hanya file .spcfg yang valid diterima!", err: "Respons Server Supercell" },
+		ms: { sel: "PILIH FAIL SPCFG", sav: "MENYIMPAN...", ok: "✓ DISIMPAN!", cd: "Had harian dicapai.", nd: "Data tidak dijumpai!", inv: "Hanya fail .spcfg yang sah diterima!", err: "Respons Pelayan Supercell" },
+		he: { sel: "בחר קובץ SPCFG", sav: "...שומר", ok: "!נשמר ✓", cd: "הגעת למגבלה היומית.", nd: "!לא נמצאו נתונים", inv: "מתקבלים רק קובצי .spcfg תקינים!", err: "Supercell תגובת שרת" },
+		fa: { sel: "انتخاب فایل SPCFG", sav: "...در حال ذخیره", ok: "!ذخیره شد ✓", cd: "محدودیت روزانه پر شده است.", nd: "!داده‌ای یافت نشد", inv: "فقط فایل‌های .spcfg معتبر پذیرفته می‌شوند!", err: "Supercell پاسخ سرور" }
 	};
 
 	function getLang() {
 		const p = location.pathname.toLowerCase();
 		const m = p.match(/\/(ar|da|de|en|es|fa|fi|fr|he|it|jp|kr|ms|id|nl|no|pl|pt|ru|sv|th|tr|vi|zh-hans|zh-hant)/);
-		return m ? m[1]: (navigator.language?.toLowerCase().startsWith('tr') ? 'tr': 'en');
+		return m ? m[1] : (navigator.language?.toLowerCase().startsWith('tr') ? 'tr' : 'en');
 	}
 
 	function tr(key) {
 		const lang = getLang();
-		return (L[lang] && L[lang][key]) ? L[lang][key]: (L.en[key] || '');
+		return (L[lang] && L[lang][key]) ? L[lang][key] : (L.en[key] || '');
 	}
 
 	async function getCryptoKey() {
-		const kStr = [173,
-			248,
-			246,
-			252,
-			173,
-			168,
-			169,
-			255,
-			247,
-			250,
-			175,
-			171,
-			189].map(c => String.fromCharCode(c ^ 206)).join('');
+		const kStr = [173, 248, 246, 252, 173, 168, 169, 255, 247, 250, 175, 171, 189].map(c => String.fromCharCode(c ^ 206)).join('');
 		const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(kStr));
-		return crypto.subtle.importKey('raw', hash, {
-			name: 'AES-GCM'
-		}, false, ['encrypt', 'decrypt']);
+		return crypto.subtle.importKey('raw', hash, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
 	}
 
 	async function encryptToBinary(plainText) {
 		const key = await getCryptoKey();
 		const iv = crypto.getRandomValues(new Uint8Array(12));
 		const encoded = new TextEncoder().encode(plainText);
-		const encrypted = await crypto.subtle.encrypt({
-			name: 'AES-GCM', iv
-		}, key, encoded);
+		const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
 		const combined = new Uint8Array(iv.length + encrypted.byteLength);
 		combined.set(iv);
 		combined.set(new Uint8Array(encrypted), iv.length);
@@ -144,9 +78,7 @@
 		for (let i = 0; i < binary.length; i++) cipherBytes[i] = binary.charCodeAt(i);
 		const iv = cipherBytes.slice(0, 12);
 		const ciphertext = cipherBytes.slice(12);
-		const decrypted = await crypto.subtle.decrypt({
-			name: 'AES-GCM', iv
-		}, key, ciphertext);
+		const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
 		return new TextDecoder().decode(decrypted);
 	}
 
@@ -161,18 +93,9 @@
 		if (!raw || typeof raw !== 'object') return raw;
 		const p = JSON.parse(JSON.stringify(raw));
 		const allKeys = [
-			"ears",
-			"earrings",
-			"head",
-			"skin_accessories",
-			"beard",
-			"mouth",
-			"eyes",
-			"eyebrows",
-			"hair",
-			"hands",
-			"accessories",
-			"effect"
+			"ears", "earrings", "head", "skin_accessories", "beard",
+			"mouth", "eyes", "eyebrows", "hair", "hands",
+			"accessories", "effect"
 		];
 		allKeys.forEach(k => {
 			if (!p[k]) {
@@ -183,20 +106,12 @@
 					name: k,
 					container: {},
 					element: {},
-					assets: {
-						"0": {}
-					},
+					assets: { "0": {} },
 					selectedAsset: 0,
 					hidden: true,
 					color: '#ffffff',
-					position: {
-						x: 270,
-						y: 300
-					},
-					offset: {
-						x: 270,
-						y: 300
-					},
+					position: { x: 270, y: 300 },
+					offset: { x: 270, y: 300 },
 					rotation: 0
 				};
 			} else {
@@ -208,26 +123,16 @@
 				if (typeof it.selectedAsset !== 'number') it.selectedAsset = 0;
 				if (typeof it.hidden !== 'boolean') it.hidden = false;
 				if (typeof it.color !== 'string') it.color = '#ffffff';
-				if (!it.position || typeof it.position.x !== 'number') it.position = {
-					x: 270,
-					y: 300
-				};
-				if (!it.offset || typeof it.offset.x !== 'number') it.offset = {
-					x: it.position.x,
-					y: it.position.y
-				};
+				if (!it.position || typeof it.position.x !== 'number') it.position = { x: 270, y: 300 };
+				if (!it.offset || typeof it.offset.x !== 'number') it.offset = { x: it.position.x, y: it.position.y };
 				if (typeof it.rotation !== 'number') it.rotation = 0;
 				if (!it.container || typeof it.container !== 'object') it.container = {};
 				if (!it.element || typeof it.element !== 'object') it.element = {};
 				if (!it.assets || typeof it.assets !== 'object') {
-					it.assets = {
-						"0": {}
-					};
+					it.assets = { "0": {} };
 				} else if (Array.isArray(it.assets)) {
 					const asObj = {};
-					it.assets.forEach((_, idx) => {
-						asObj[idx] = {};
-					});
+					it.assets.forEach((_, idx) => { asObj[idx] = {}; });
 					it.assets = asObj;
 				}
 			}
@@ -244,14 +149,8 @@
 				selectedAsset: 0,
 				hidden: false,
 				color: '#421bc9',
-				position: {
-					x: 0,
-					y: 0
-				},
-				offset: {
-					x: 0,
-					y: 0
-				},
+				position: { x: 0, y: 0 },
+				offset: { x: 0, y: 0 },
 				rotation: 0
 			};
 		} else {
@@ -263,14 +162,8 @@
 			if (typeof p.background.selectedAsset !== 'number') p.background.selectedAsset = 0;
 			if (typeof p.background.hidden !== 'boolean') p.background.hidden = false;
 			if (typeof p.background.color !== 'string') p.background.color = '#421bc9';
-			if (!p.background.position) p.background.position = {
-				x: 0,
-				y: 0
-			};
-			if (!p.background.offset) p.background.offset = {
-				x: 0,
-				y: 0
-			};
+			if (!p.background.position) p.background.position = { x: 0, y: 0 };
+			if (!p.background.offset) p.background.offset = { x: 0, y: 0 };
 			if (typeof p.background.rotation !== 'number') p.background.rotation = 0;
 		}
 		if (!p.main) {
@@ -285,14 +178,8 @@
 				selectedAsset: -1,
 				hidden: false,
 				color: '#ffffff',
-				position: {
-					x: 0,
-					y: -68.4549560546875
-				},
-				offset: {
-					x: 0,
-					y: 0
-				},
+				position: { x: 0, y: -68.4549560546875 },
+				offset: { x: 0, y: 0 },
 				rotation: 0
 			};
 		} else {
@@ -304,14 +191,8 @@
 			if (typeof p.main.selectedAsset !== 'number') p.main.selectedAsset = -1;
 			if (typeof p.main.hidden !== 'boolean') p.main.hidden = false;
 			if (typeof p.main.color !== 'string') p.main.color = '#ffffff';
-			if (!p.main.position) p.main.position = {
-				x: 0,
-				y: -68.4549560546875
-			};
-			if (!p.main.offset) p.main.offset = {
-				x: 0,
-				y: 0
-			};
+			if (!p.main.position) p.main.position = { x: 0, y: -68.4549560546875 };
+			if (!p.main.offset) p.main.offset = { x: 0, y: 0 };
 			if (typeof p.main.rotation !== 'number') p.main.rotation = 0;
 		}
 		if (!p.backgroundPattern) p.backgroundPattern = "desktopPatternBg.png";
@@ -341,21 +222,9 @@
 			return preparePinPayload(p);
 		}
 		const k = [
-			'ears',
-			'earrings',
-			'head',
-			'skin_accessories',
-			'beard',
-			'mouth',
-			'eyes',
-			'eyebrows',
-			'hair',
-			'hands',
-			'accessories',
-			'effect',
-			'background',
-			'main',
-			'backgroundPattern',
+			'ears', 'earrings', 'head', 'skin_accessories', 'beard',
+			'mouth', 'eyes', 'eyebrows', 'hair', 'hands',
+			'accessories', 'effect', 'background', 'main', 'backgroundPattern',
 		];
 		const r = {};
 		k.forEach((x) => {
@@ -649,7 +518,7 @@
 					}
 
 					const lbl = mySaveBtn.querySelector('.pickedLabel__label');
-					const origTxt = lbl ? lbl.textContent: '';
+					const origTxt = lbl ? lbl.textContent : '';
 					if (lbl) lbl.textContent = tr('sav');
 
 					const payloadToSend = preparePinPayload(rawPayload);
@@ -693,7 +562,7 @@
 				myPickerBtn.id = 'pm-json-picker-btn';
 				myPickerBtn.style.marginTop = '14px';
 				const flbl = myPickerBtn.querySelector('.pickedLabel__label');
-				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName): tr('sel'), mySaveBtn);
+				updateLabel(flbl, window.__customPinFileName ? ('✓ ' + window.__customPinFileName) : tr('sel'), mySaveBtn);
 
 				myPickerBtn.onclick = function (e) {
 					e.preventDefault();
@@ -757,7 +626,7 @@
 			if (mySaveBtn && realSaveBtn) {
 				const realRBtn = realSaveBtn.querySelector('.RectangleButton');
 				const myRBtn = mySaveBtn.querySelector('.RectangleButton');
-				const pickerRBtn = myPickerBtn ? myPickerBtn.querySelector('.RectangleButton'): null;
+				const pickerRBtn = myPickerBtn ? myPickerBtn.querySelector('.RectangleButton') : null;
 				if (realRBtn && myRBtn) {
 					myRBtn.className = realRBtn.className;
 					if (pickerRBtn) pickerRBtn.className = realRBtn.className;
